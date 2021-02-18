@@ -1,0 +1,14 @@
+ < < Discriminator > >
+<D> embedding parameters (50): 50
+<D> leaky ReLU alpha (0.2): 0.20000
+<D> convolution filters (128): 128
+ < < Generator > >
+<G> embedding parameters (50): 50
+<G> hidden layers1 (1): 1
+<G> hidden layers2 (1): 1
+<G> hidden units2 (128): 128
+<G> deconvolution filters (128): 128
+<G> leaky ReLU alpha (0.2): 0.20000
+ < < Other > >
+n_classes: 47
+Learning rate (0.0002): 0.00020
