@@ -78,7 +78,7 @@ rtp_train_n_epochs = 200
 
 # Create directory for next run
 os.makedirs(rtp_name)
-copyfile('ex_cgan.py', rtp_name + 'ex_cgan.py')
+copyfile(argv[0], rtp_name + argv[0])
 
 with open(rtp_name + 'rtp.txt', 'w') as rtp_f:
 	rtp_f.write(" < < Discriminator > >\n")
