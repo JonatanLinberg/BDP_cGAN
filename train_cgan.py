@@ -110,6 +110,27 @@ def scale_images(images, new_shape):
 		images_list.append(new_image)
 	return asarray(images_list)
 
+def save_euclidean_distance_plot(examples, n_cl, epoch):
+	n_ex = len(examples)
+	ex_cl = n_ex // n_cl
+	ed_cl = ex_cl*(ex_cl-1)//2
+	result = array(zeros((n_cl, ed_cl)), float32)
+	# all same class
+	for i in range(n_ex):
+		for j in range((i//n_cl) + 1, n_ex//n_cl):
+			i_cl = i // n_cl
+			index = (j-i_cl -1) + (ed_cl - ((ex_cl-i_cl)*(ex_cl-i_cl-1)//2))
+			#print('x:', i%n_cl, '\ty:', index, '\tj: ', j, '\tx: ', ex_cl, '\ted: ', ed_cl, '\ti_cl: ', i_cl, '\th(x-i_cl): ', ((ex_cl-i_cl)*(ex_cl-i_cl-1)//2))
+			result[i % n_cl, index] = (norm(examples[i, :, :, 0] - examples[((j*n_cl)+(i%n_cl)), :, :, 0]))
+	pyplot.figure(figsize=(12, 5))
+	pyplot.boxplot(transpose(result))
+	pyplot.xlabel("class")
+	pyplot.ylabel("euclidean distance")
+	pyplot.tight_layout()
+	pyplot.ylim(bottom=0)
+	pyplot.savefig(rtp_name + 'euclid_plot_%d' % epoch)
+
+
 # create and save a plot of generated images
 def save_plot(examples, epoch, rows, cols):
 
@@ -375,6 +396,7 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 		out = g_model.predict([img_lat_pnt, img_lbl])
 		out = (out + 1) / 2.0
 		save_plot(out, (i + 1), img_ex_count, rtp_n_classes)
+		save_euclidean_distance_plot(out, rtp_n_classes, (i+1))
 
 		# save the generator model
 		f_name = '%d.h5' % (i + 1)
