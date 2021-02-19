@@ -7,9 +7,13 @@ from numpy import expand_dims
 from numpy import zeros
 from numpy import ones
 from numpy import asarray
+from numpy import array
 from numpy import reshape
+from numpy import transpose
+from numpy import float32
 from numpy.random import randn
 from numpy.random import randint
+from numpy.linalg import norm
 import os
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
 # os.environ["CUDA_VISIBLE_DEVICES"] = '-1'
