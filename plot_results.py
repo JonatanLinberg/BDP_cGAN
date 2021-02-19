@@ -17,8 +17,10 @@ choice = int(input('1. all plots\n2. loss only\n3. accuracy only\n4. FID only\nC
 if (choice == 1):
 	plot, sub = plt.subplots(3)
 	sub[0].plot(df[['d_loss_real','d_loss_fake','g_loss']])
+	sub[0].legend(('d_loss_real','d_loss_fake','g_loss'))
 	sub[0].set_ylabel('loss')
 	sub[1].plot(df[['d_acc_real', 'd_acc_fake']])
+	sub[1].legend(('d_acc_real', 'd_acc_fake'))
 	sub[1].set_ylabel('accuracy')
 	sub[2].plot(df['FID'])
 	sub[2].set_ylabel('FID')
