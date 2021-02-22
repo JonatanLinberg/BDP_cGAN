@@ -19,6 +19,7 @@ import os
 # os.environ["CUDA_VISIBLE_DEVICES"] = '-1'
 from matplotlib import pyplot
 from shutil import copyfile
+from shutil import move
 from tensorflow.keras.datasets.fashion_mnist import load_data
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
@@ -54,24 +55,45 @@ rtp_name = input("enter name: ") + '/'
 # Note! Training or testing is set in the load_real_samples function
 mndata.select_emnist('balanced')	# 'balanced', 'byclass'...
 rtp_n_classes = 47		# Important, will crash if not set correctly
-# Discriminator parameters
-print(" < < Discriminator > >")
-rtp_discriminator_n_embedding = int(input('<D> embedding parameters (50): '))
-rtp_d_hidden_layers1 = int(input('<D> hidden layers1 (0): '))
-rtp_d_hidden_units1 = int(input('<D> hidden units1 (0): '))
-rtp_d_LeReLU_alpha = float(input('<D> leaky ReLU alpha (0.2): '))
-rtp_d_conv_filters = int(input('<D> convolution filters (128): '))
-# Generator parameters
-print(" < < Generator > >")
-rtp_generator_n_embedding = int(input('<G> embedding parameters (50): '))
-rtp_g_hidden_layers1 = int(input('<G> hidden layers1 (1): '))
-rtp_g_hidden_layers2 = int(input('<G> hidden layers2 (1): '))
-rtp_g_hidden_units_mult2 = int(input('<G> hidden unit mult2 (128): '))
-rtp_g_deconv_filters = int(input('<G> deconvolution filters (128): '))
-rtp_g_LeReLU_alpha = float(input('<G> leaky ReLU alpha (0.2): '))
 
-print(" < < Other > >")
-rtp_learn_rate = float(input('Learning rate (0.0002): '))
+if (len(argv) > 1): # linked rtp-file
+	with open(argv[1], 'r') as rtp_file:
+		# Discriminator parameters
+		rtp_discriminator_n_embedding = int(rtp_file.readline().split(':')[1])
+		rtp_d_hidden_layers1 = int(rtp_file.readline().split(':')[1])
+		rtp_d_hidden_units1 = int(rtp_file.readline().split(':')[1])
+		rtp_d_LeReLU_alpha = float(rtp_file.readline().split(':')[1])
+		rtp_d_conv_filters = int(rtp_file.readline().split(':')[1])
+		# Generator parameters
+		rtp_generator_n_embedding = int(rtp_file.readline().split(':')[1])
+		rtp_g_hidden_layers1 = int(rtp_file.readline().split(':')[1])
+		rtp_g_hidden_layers2 = int(rtp_file.readline().split(':')[1])
+		rtp_g_hidden_units_mult2 = int(rtp_file.readline().split(':')[1])
+		rtp_g_deconv_filters = int(rtp_file.readline().split(':')[1])
+		rtp_g_LeReLU_alpha = float(rtp_file.readline().split(':')[1])
+		# other
+		rtp_learn_rate = float(rtp_file.readline().split(':')[1])
+
+else:
+	# Discriminator parameters
+	print(" < < Discriminator > >")
+	rtp_discriminator_n_embedding = int(input('<D> embedding parameters (50): '))
+	rtp_d_hidden_layers1 = int(input('<D> hidden layers1 (0): '))
+	rtp_d_hidden_units1 = int(input('<D> hidden units1 (0): '))
+	rtp_d_LeReLU_alpha = float(input('<D> leaky ReLU alpha (0.2): '))
+	rtp_d_conv_filters = int(input('<D> convolution filters (128): '))
+	# Generator parameters
+	print(" < < Generator > >")
+	rtp_generator_n_embedding = int(input('<G> embedding parameters (50): '))
+	rtp_g_hidden_layers1 = int(input('<G> hidden layers1 (1): '))
+	rtp_g_hidden_layers2 = int(input('<G> hidden layers2 (1): '))
+	rtp_g_hidden_units_mult2 = int(input('<G> hidden unit mult2 (128): '))
+	rtp_g_deconv_filters = int(input('<G> deconvolution filters (128): '))
+	rtp_g_LeReLU_alpha = float(input('<G> leaky ReLU alpha (0.2): '))
+
+	print(" < < Other > >")
+	rtp_learn_rate = float(input('Learning rate (0.0002): '))
+
 visualize = input('Only show models (y/n): ')
 
 # Training parameters
@@ -84,6 +106,7 @@ rtp_train_n_epochs = 200
 os.makedirs(rtp_name)
 copyfile(argv[0], rtp_name + argv[0])
 
+# write RTPs to rtp.txt
 with open(rtp_name + 'rtp.txt', 'w') as rtp_f:
 	rtp_f.write('<D> embedding parameters (50): %d\n' % rtp_discriminator_n_embedding)
 	rtp_f.write('<D> hidden layers1 (0): %d\n' % rtp_d_hidden_layers1)
@@ -96,8 +119,8 @@ with open(rtp_name + 'rtp.txt', 'w') as rtp_f:
 	rtp_f.write('<G> hidden units2 (128): %d\n' % rtp_g_hidden_units_mult2)
 	rtp_f.write('<G> deconvolution filters (128): %d\n' % rtp_g_deconv_filters)
 	rtp_f.write('<G> leaky ReLU alpha (0.2): %.05f\n' % rtp_g_LeReLU_alpha)
-	rtp_f.write('n_classes: %d\n' % rtp_n_classes)
 	rtp_f.write('Learning rate (0.0002): %.05f\n' % rtp_learn_rate)
+	rtp_f.write('n_classes: %d\n' % rtp_n_classes)
 
 
 
