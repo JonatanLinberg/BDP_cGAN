@@ -129,8 +129,8 @@ os.makedirs(rtp_name)
 copyfile(argv[0], rtp_name + argv[0])
 
 # write RTPs to rtp.txt
-with open(rtp_name + 'rtp.txt', 'w') as rtp_f:
-	for conf in rtp_conf_list:
+for i, conf in enumerate(rtp_conf_list):
+	with open(rtp_name + 'rtp%d.txt' % i, 'w') as rtp_f:
 		rtp_f.write('<D> embedding parameters (50):%d\n' % conf['d_embedding'])
 		rtp_f.write('<D> hidden layers1 (0):%d\n' % conf['d_hidden_layers1'])
 		rtp_f.write('<D> hidden units1 (0):%d\n' % conf['d_hidden_units1'])
@@ -144,7 +144,6 @@ with open(rtp_name + 'rtp.txt', 'w') as rtp_f:
 		rtp_f.write('<G> leaky ReLU alpha (0.2):%.05f\n' % conf['g_LeReLU_alpha'])
 		rtp_f.write('Learning rate (0.0002):%.05f\n' % conf['learn_rate'])
 		rtp_f.write('n_classes:%d\n' % rtp_n_classes)
-
 
 
 # scale an array of images to a new size
