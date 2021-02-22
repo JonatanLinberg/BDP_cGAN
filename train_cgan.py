@@ -310,7 +310,7 @@ def define_gan(g_model, d_model):
 	# define gan model as taking noise and label and outputting a classification
 	model = Model([gen_noise, gen_label], gan_output)
 	# compile model
-	opt = Adam(lr=rtp_learn_rate, beta_1=0.5)
+	opt = Adam(lr=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
 	model.compile(loss='binary_crossentropy', optimizer=opt)
 	return model
 
