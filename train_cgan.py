@@ -127,7 +127,7 @@ rtp_train_n_epochs = 200
 
 # Create directory for next run
 os.makedirs(rtp_folder_name)
-copyfile(argv[0], rtp_folder_name + argv[0])
+copyfile(argv[0].split('/')[len(argv[0].split('/'))-1], rtp_folder_name + argv[0].split('/')[len(argv[0].split('/'))-1])
 
 # write RTPs to rtp.txt
 for i, conf in enumerate(rtp_conf_list):
