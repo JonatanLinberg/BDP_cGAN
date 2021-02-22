@@ -125,6 +125,24 @@ rtp_train_n_batch = 128		# multiple of 16
 # > > > rtp_train_n_batch * rtp_fid_samples ≈ 5120
 rtp_train_n_epochs = 200
 
+def untuple_list(l1):
+	l2 = []
+	for conf in l1:
+		tupless = True
+		for i in conf:
+			if (type(conf[i]) is tuple):
+				tupless = False
+				for val in conf[i]:
+					temp = conf.copy()
+					temp[i] = val
+					l1.append(temp)
+		if (tupless and conf not in l2):
+			l2.append(conf)
+
+	return l2
+
+rtp_conf_list = untuple_list(rtp_conf_list)
+
 # Create directory for next run
 os.makedirs(rtp_folder_name)
 copyfile(argv[0].split('/')[len(argv[0].split('/'))-1], rtp_folder_name + argv[0].split('/')[len(argv[0].split('/'))-1])
