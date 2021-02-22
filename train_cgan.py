@@ -70,7 +70,7 @@ rtp_def_conf = {'d_embedding':50,
 				'g_LeReLU_alpha':0.2,
 				'learn_rate':0.0002}
 rtp_conf_list = []
-
+rtp_list_index = 0
 if (len(argv) > 1): # linked rtp-file
 	with open(argv[1], 'r') as rtp_file:
 		# Discriminator parameters
@@ -218,7 +218,7 @@ def define_discriminator(in_shape=(28,28,1), n_classes=rtp_n_classes):
 	# label input
 	in_label = Input(shape=(1,))
 	# embedding for categorical input
-	li = Embedding(n_classes, rtp_discriminator_n_embedding)(in_label)
+	li = Embedding(n_classes, rtp_conf_list[rtp_list_index]['d_embedding'])(in_label)
 	# scale up to image dimensions with linear activation
 	n_nodes = in_shape[0] * in_shape[1]
 	li = Dense(n_nodes)(li)
@@ -230,28 +230,28 @@ def define_discriminator(in_shape=(28,28,1), n_classes=rtp_n_classes):
 	merge = Concatenate()([in_image, li])
 	#print(merge.shape)
 	# downsample
-	fe = Conv2D(rtp_d_conv_filters, (3,3), strides=(2,2), padding='same')(merge)
+	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(2,2), padding='same')(merge)
 	#print(fe.shape)
-	fe = LeakyReLU(alpha=rtp_d_LeReLU_alpha)(fe)
+	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
 	#print(fe.shape)
 	# downsample
-	fe = Conv2D(rtp_d_conv_filters, (3,3), strides=(2,2), padding='same')(fe)
+	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(2,2), padding='same')(fe)
 	#print(fe.shape)
-	fe = LeakyReLU(alpha=rtp_d_LeReLU_alpha)(fe)
+	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
 	#print(fe.shape)
 	# flatten feature maps
 	fe = Flatten()(fe)
 	# dropout
 	fe = Dropout(0.4)(fe)
-	for i in range(rtp_d_hidden_layers1):
-		fe = Dense(rtp_d_hidden_units1)(fe)
+	for i in range(rtp_conf_list[rtp_list_index]['d_hidden_layers1']):
+		fe = Dense(rtp_conf_list[rtp_list_index]['d_hidden_units1'])(fe)
 		fe = Dropout(0.4)(fe)
 	# output
 	out_layer = Dense(1, activation='sigmoid')(fe)
 	# define model
 	model = Model([in_image, in_label], out_layer)
 	# compile model
-	opt = Adam(lr=rtp_learn_rate, beta_1=0.5)
+	opt = Adam(lr=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
 	model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 	return model
 
@@ -260,35 +260,35 @@ def define_generator(latent_dim, n_classes=rtp_n_classes):
 	# label input
 	in_label = Input(shape=(1,))
 	# embedding for categorical input
-	li = Embedding(n_classes, rtp_generator_n_embedding)(in_label)
+	li = Embedding(n_classes, rtp_conf_list[rtp_list_index]['g_embedding'])(in_label)
 	# linear multiplication
 	n_nodes = 7 * 7
-	for i in range(rtp_g_hidden_layers1):
+	for i in range(rtp_conf_list[rtp_list_index]['g_hidden_layers1']):
 		li = Dense(n_nodes)(li)
-		li = LeakyReLU(alpha=rtp_g_LeReLU_alpha)(li)
+		li = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(li)
 	# reshape to additional channel
 	li = Reshape((7, 7, 1))(li)
 	
 	# image generator input
 	in_lat = Input(shape=(latent_dim,))
 	# foundation for 7x7 image
-	n_nodes = rtp_g_hidden_units_mult2 * 7 * 7
+	n_nodes = rtp_conf_list[rtp_list_index]['g_hidden_units_mult2'] * 7 * 7
 	gen = Dense(n_nodes)(in_lat)
-	gen = LeakyReLU(alpha=rtp_g_LeReLU_alpha)(gen)
-	for i in range(rtp_g_hidden_layers2-1):
+	gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
+	for i in range(rtp_conf_list[rtp_list_index]['g_hidden_layers2']-1):
 		gen = Dense(n_nodes)(gen)
-		gen = LeakyReLU(alpha=rtp_g_LeReLU_alpha)(gen)
-	gen = Reshape((7, 7, rtp_g_hidden_units_mult2))(gen)
+		gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
+	gen = Reshape((7, 7, rtp_conf_list[rtp_list_index]['g_hidden_units_mult2']))(gen)
 	
 	# merge image gen and label input
 	merge = Concatenate()([gen, li])
 	# upsample to 14x14
-	gen = Conv2DTranspose(rtp_g_deconv_filters, (4,4), strides=(2,2), padding='same')(merge)
-	gen = LeakyReLU(alpha=rtp_g_LeReLU_alpha)(gen)
+	gen = Conv2DTranspose(rtp_conf_list[rtp_list_index]['g_deconv_filters'], (4,4), strides=(2,2), padding='same')(merge)
+	gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
 	#print(gen.shape)
 	# upsample to 28x28
-	gen = Conv2DTranspose(rtp_g_deconv_filters, (4,4), strides=(2,2), padding='same')(gen)
-	gen = LeakyReLU(alpha=rtp_g_LeReLU_alpha)(gen)
+	gen = Conv2DTranspose(rtp_conf_list[rtp_list_index]['g_deconv_filters'], (4,4), strides=(2,2), padding='same')(gen)
+	gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
 	#print(gen.shape)
 	# output
 	out_layer = Conv2D(1, (7,7), activation='tanh', padding='same')(gen)
