@@ -43,7 +43,6 @@ from scipy.linalg import sqrtm
 from skimage.transform import resize
 from mnist import MNIST
 from sys import argv
-from collections import namedtuple
 
 mndata = MNIST('./emnist_data')
 mndata.gz = True
@@ -58,61 +57,63 @@ rtp_name = input("enter name: ") + '/'
 mndata.select_emnist('balanced')	# 'balanced', 'byclass'...
 rtp_n_classes = 47		# Important, will crash if not set correctly
 
-rtp_conf = namedtuple('rtp_conf', [	'd_embedding', 
-									'd_hidden_layers1',
-									'd_hidden_units1',
-									'd_LeReLU_alpha',
-									'd_conv_filters',
-									'g_embedding',
-									'g_hidden_layers1',
-									'g_hidden_layers2',
-									'g_hidden_units_mult2',
-									'g_deconv_filters',
-									'g_LeReLU_alpha',
-									'learn_rate'])
+rtp_def_conf = {'d_embedding':50,
+				'd_hidden_layers1':0,
+				'd_hidden_units1':0,
+				'd_LeReLU_alpha':0.2,
+				'd_conv_filters':128,
+				'g_embedding':50,
+				'g_hidden_layers1':1,
+				'g_hidden_layers2':1,
+				'g_hidden_units_mult2':128,
+				'g_deconv_filters':128,
+				'g_LeReLU_alpha':0.2,
+				'learn_rate':0.0002}
 rtp_conf_list = []
 
 if (len(argv) > 1): # linked rtp-file
 	with open(argv[1], 'r') as rtp_file:
 		# Discriminator parameters
-		rtp_discriminator_n_embedding = literal_eval(rtp_file.readline().split(':')[1])
-		rtp_d_hidden_layers1 = literal_eval(rtp_file.readline().split(':')[1])
-		rtp_d_hidden_units1 = literal_eval(rtp_file.readline().split(':')[1])
-		rtp_d_LeReLU_alpha = literal_eval(rtp_file.readline().split(':')[1])
-		rtp_d_conv_filters = literal_eval(rtp_file.readline().split(':')[1])
+		rtp_conf = {}
+		rtp_conf['d_embedding'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['d_hidden_layers1'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['d_hidden_units1'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['d_LeReLU_alpha'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['d_conv_filters'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		# Generator parameters
-		rtp_generator_n_embedding = literal_eval(rtp_file.readline().split(':')[1])
-		rtp_g_hidden_layers1 = literal_eval(rtp_file.readline().split(':')[1])
-		rtp_g_hidden_layers2 = literal_eval(rtp_file.readline().split(':')[1])
-		rtp_g_hidden_units_mult2 = literal_eval(rtp_file.readline().split(':')[1])
-		rtp_g_deconv_filters = literal_eval(rtp_file.readline().split(':')[1])
-		rtp_g_LeReLU_alpha = literal_eval(rtp_file.readline().split(':')[1])
+		rtp_conf['g_embedding'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['g_hidden_layers1'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['g_hidden_layers2'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['g_hidden_units_mult2'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['g_deconv_filters'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['g_LeReLU_alpha'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		# other
-		rtp_learn_rate = literal_eval(rtp_file.readline().split(':')[1])
-		rtp_conf_list.append(rtp_conf())
-
+		rtp_conf['learn_rate'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf_list.append(rtp_conf)
 else:
 	try:# Discriminator parameters
+		rtp_conf = {}
 		print(" < < Discriminator > >")
-		rtp_discriminator_n_embedding = literal_eval(input('<D> embedding parameters (50): '))
-		rtp_d_hidden_layers1 = literal_eval(input('<D> hidden layers1 (0): '))
-		rtp_d_hidden_units1 = literal_eval(input('<D> hidden units1 (0): '))
-		rtp_d_LeReLU_alpha = literal_eval(input('<D> leaky ReLU alpha (0.2): '))
-		rtp_d_conv_filters = literal_eval(input('<D> convolution filters (128): '))
+		rtp_conf['d_embedding'] = literal_eval(input('<D> embedding parameters (50): ').strip())
+		rtp_conf['d_hidden_layers1'] = literal_eval(input('<D> hidden layers1 (0): ').strip())
+		rtp_conf['d_hidden_units1'] = literal_eval(input('<D> hidden units1 (0): ').strip())
+		rtp_conf['d_LeReLU_alpha'] = literal_eval(input('<D> leaky ReLU alpha (0.2): ').strip())
+		rtp_conf['d_conv_filters'] = literal_eval(input('<D> convolution filters (128): ').strip())
 		# Generator parameters
 		print(" < < Generator > >")
-		rtp_generator_n_embedding = literal_eval(input('<G> embedding parameters (50): '))
-		rtp_g_hidden_layers1 = literal_eval(input('<G> hidden layers1 (1): '))
-		rtp_g_hidden_layers2 = literal_eval(input('<G> hidden layers2 (1): '))
-		rtp_g_hidden_units_mult2 = literal_eval(input('<G> hidden unit mult2 (128): '))
-		rtp_g_deconv_filters = literal_eval(input('<G> deconvolution filters (128): '))
-		rtp_g_LeReLU_alpha = literal_eval(input('<G> leaky ReLU alpha (0.2): '))
+		rtp_conf['g_embedding'] = literal_eval(input('<G> embedding parameters (50): ').strip())
+		rtp_conf['g_hidden_layers1'] = literal_eval(input('<G> hidden layers1 (1): ').strip())
+		rtp_conf['g_hidden_layers2'] = literal_eval(input('<G> hidden layers2 (1): ').strip())
+		rtp_conf['g_hidden_units_mult2'] = literal_eval(input('<G> hidden unit mult2 (128): ').strip())
+		rtp_conf['g_deconv_filters'] = literal_eval(input('<G> deconvolution filters (128): ').strip())
+		rtp_conf['g_LeReLU_alpha'] = literal_eval(input('<G> leaky ReLU alpha (0.2): ').strip())
 
 		print(" < < Other > >")
-		rtp_learn_rate = float(input('Learning rate (0.0002): '))
+		rtp_conf['learn_rate'] = float(input('Learning rate (0.0002): ').strip())
+		rtp_conf_list.append(rtp_conf)
 	except: 
 		print("ERROR!\nUsing default values...")
-		rtp_conf_list.append(rtp_conf(50,0,0,0.2,128,50,1,1,128,128,0.2,0.0002))
+		rtp_conf_list.append(rtp_def_conf)
 
 
 visualize = input('Only show models (y/n): ')
@@ -130,19 +131,19 @@ copyfile(argv[0], rtp_name + argv[0])
 # write RTPs to rtp.txt
 with open(rtp_name + 'rtp.txt', 'w') as rtp_f:
 	for conf in rtp_conf_list:
-		rtp_f.write('<D> embedding parameters (50): %d\n' % conf.d_embedding)
-		rtp_f.write('<D> hidden layers1 (0): %d\n' % conf.d_hidden_layers1)
-		rtp_f.write('<D> hidden units1 (0): %d\n' % conf.d_hidden_units1)
-		rtp_f.write('<D> leaky ReLU alpha (0.2): %.05f\n' % conf.d_LeReLU_alpha)
-		rtp_f.write('<D> convolution filters (128): %d\n' % conf.d_conv_filters)
-		rtp_f.write('<G> embedding parameters (50): %d\n' % conf.g_embedding)
-		rtp_f.write('<G> hidden layers1 (1): %d\n' % conf.g_hidden_layers1)
-		rtp_f.write('<G> hidden layers2 (1): %d\n' % conf.g_hidden_layers2)
-		rtp_f.write('<G> hidden units2 (128): %d\n' % conf.g_hidden_units_mult2)
-		rtp_f.write('<G> deconvolution filters (128): %d\n' % conf.g_deconv_filters)
-		rtp_f.write('<G> leaky ReLU alpha (0.2): %.05f\n' % conf.g_LeReLU_alpha)
-		rtp_f.write('Learning rate (0.0002): %.05f\n' % conf.learn_rate)
-		rtp_f.write('n_classes: %d\n' % rtp_n_classes)
+		rtp_f.write('<D> embedding parameters (50):%d\n' % conf['d_embedding'])
+		rtp_f.write('<D> hidden layers1 (0):%d\n' % conf['d_hidden_layers1'])
+		rtp_f.write('<D> hidden units1 (0):%d\n' % conf['d_hidden_units1'])
+		rtp_f.write('<D> leaky ReLU alpha (0.2):%.05f\n' % conf['d_LeReLU_alpha'])
+		rtp_f.write('<D> convolution filters (128):%d\n' % conf['d_conv_filters'])
+		rtp_f.write('<G> embedding parameters (50):%d\n' % conf['g_embedding'])
+		rtp_f.write('<G> hidden layers1 (1):%d\n' % conf['g_hidden_layers1'])
+		rtp_f.write('<G> hidden layers2 (1):%d\n' % conf['g_hidden_layers2'])
+		rtp_f.write('<G> hidden units2 (128):%d\n' % conf['g_hidden_units_mult2'])
+		rtp_f.write('<G> deconvolution filters (128):%d\n' % conf['g_deconv_filters'])
+		rtp_f.write('<G> leaky ReLU alpha (0.2):%.05f\n' % conf['g_LeReLU_alpha'])
+		rtp_f.write('Learning rate (0.0002):%.05f\n' % conf['learn_rate'])
+		rtp_f.write('n_classes:%d\n' % rtp_n_classes)
 
 
 
