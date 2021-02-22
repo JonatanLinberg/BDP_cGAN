@@ -1,2 +1,4 @@
 emnist_data
+/venv
+/.idea
 *.h5
