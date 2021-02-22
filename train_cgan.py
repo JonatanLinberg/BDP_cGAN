@@ -20,6 +20,7 @@ import os
 from matplotlib import pyplot
 from shutil import copyfile
 from shutil import move
+from ast import literal_eval
 from tensorflow.keras.datasets.fashion_mnist import load_data
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
@@ -50,49 +51,71 @@ mndata.gz = True
 ################################
 # rtp_ = runtime parameter
 # Folder and filename
-rtp_name = input("enter name: ") + '/'
+rtp_folder_name = input("enter name: ") + '/'
+rtp_root_folder = rtp_folder_name
 # Dataset
 # Note! Training or testing is set in the load_real_samples function
 mndata.select_emnist('balanced')	# 'balanced', 'byclass'...
 rtp_n_classes = 47		# Important, will crash if not set correctly
 
+rtp_def_conf = {'d_embedding':50,
+				'd_hidden_layers1':0,
+				'd_hidden_units1':0,
+				'd_LeReLU_alpha':0.2,
+				'd_conv_filters':128,
+				'g_embedding':50,
+				'g_hidden_layers1':1,
+				'g_hidden_layers2':1,
+				'g_hidden_units_mult2':128,
+				'g_deconv_filters':128,
+				'g_LeReLU_alpha':0.2,
+				'learn_rate':0.0002}
+rtp_conf_list = []
+rtp_list_index = 0
 if (len(argv) > 1): # linked rtp-file
 	with open(argv[1], 'r') as rtp_file:
 		# Discriminator parameters
-		rtp_discriminator_n_embedding = int(rtp_file.readline().split(':')[1])
-		rtp_d_hidden_layers1 = int(rtp_file.readline().split(':')[1])
-		rtp_d_hidden_units1 = int(rtp_file.readline().split(':')[1])
-		rtp_d_LeReLU_alpha = float(rtp_file.readline().split(':')[1])
-		rtp_d_conv_filters = int(rtp_file.readline().split(':')[1])
+		rtp_conf = {}
+		rtp_conf['d_embedding'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['d_hidden_layers1'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['d_hidden_units1'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['d_LeReLU_alpha'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['d_conv_filters'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		# Generator parameters
-		rtp_generator_n_embedding = int(rtp_file.readline().split(':')[1])
-		rtp_g_hidden_layers1 = int(rtp_file.readline().split(':')[1])
-		rtp_g_hidden_layers2 = int(rtp_file.readline().split(':')[1])
-		rtp_g_hidden_units_mult2 = int(rtp_file.readline().split(':')[1])
-		rtp_g_deconv_filters = int(rtp_file.readline().split(':')[1])
-		rtp_g_LeReLU_alpha = float(rtp_file.readline().split(':')[1])
+		rtp_conf['g_embedding'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['g_hidden_layers1'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['g_hidden_layers2'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['g_hidden_units_mult2'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['g_deconv_filters'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['g_LeReLU_alpha'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		# other
-		rtp_learn_rate = float(rtp_file.readline().split(':')[1])
-
+		rtp_conf['learn_rate'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf_list.append(rtp_conf)
 else:
-	# Discriminator parameters
-	print(" < < Discriminator > >")
-	rtp_discriminator_n_embedding = int(input('<D> embedding parameters (50): '))
-	rtp_d_hidden_layers1 = int(input('<D> hidden layers1 (0): '))
-	rtp_d_hidden_units1 = int(input('<D> hidden units1 (0): '))
-	rtp_d_LeReLU_alpha = float(input('<D> leaky ReLU alpha (0.2): '))
-	rtp_d_conv_filters = int(input('<D> convolution filters (128): '))
-	# Generator parameters
-	print(" < < Generator > >")
-	rtp_generator_n_embedding = int(input('<G> embedding parameters (50): '))
-	rtp_g_hidden_layers1 = int(input('<G> hidden layers1 (1): '))
-	rtp_g_hidden_layers2 = int(input('<G> hidden layers2 (1): '))
-	rtp_g_hidden_units_mult2 = int(input('<G> hidden unit mult2 (128): '))
-	rtp_g_deconv_filters = int(input('<G> deconvolution filters (128): '))
-	rtp_g_LeReLU_alpha = float(input('<G> leaky ReLU alpha (0.2): '))
+	try:# Discriminator parameters
+		rtp_conf = {}
+		print(" < < Discriminator > >")
+		rtp_conf['d_embedding'] = literal_eval(input('<D> embedding parameters (50): ').strip())
+		rtp_conf['d_hidden_layers1'] = literal_eval(input('<D> hidden layers1 (0): ').strip())
+		rtp_conf['d_hidden_units1'] = literal_eval(input('<D> hidden units1 (0): ').strip())
+		rtp_conf['d_LeReLU_alpha'] = literal_eval(input('<D> leaky ReLU alpha (0.2): ').strip())
+		rtp_conf['d_conv_filters'] = literal_eval(input('<D> convolution filters (128): ').strip())
+		# Generator parameters
+		print(" < < Generator > >")
+		rtp_conf['g_embedding'] = literal_eval(input('<G> embedding parameters (50): ').strip())
+		rtp_conf['g_hidden_layers1'] = literal_eval(input('<G> hidden layers1 (1): ').strip())
+		rtp_conf['g_hidden_layers2'] = literal_eval(input('<G> hidden layers2 (1): ').strip())
+		rtp_conf['g_hidden_units_mult2'] = literal_eval(input('<G> hidden unit mult2 (128): ').strip())
+		rtp_conf['g_deconv_filters'] = literal_eval(input('<G> deconvolution filters (128): ').strip())
+		rtp_conf['g_LeReLU_alpha'] = literal_eval(input('<G> leaky ReLU alpha (0.2): ').strip())
 
-	print(" < < Other > >")
-	rtp_learn_rate = float(input('Learning rate (0.0002): '))
+		print(" < < Other > >")
+		rtp_conf['learn_rate'] = float(input('Learning rate (0.0002): ').strip())
+		rtp_conf_list.append(rtp_conf)
+	except: 
+		print("ERROR!\nUsing default values...")
+		rtp_conf_list.append(rtp_def_conf)
+
 
 visualize = input('Only show models (y/n): ')
 
@@ -103,25 +126,25 @@ rtp_train_n_batch = 128		# multiple of 16
 rtp_train_n_epochs = 200
 
 # Create directory for next run
-os.makedirs(rtp_name)
-copyfile(argv[0].split('/')[len(argv[0].split('/'))-1], rtp_name + argv[0].split('/')[len(argv[0].split('/'))-1])
+os.makedirs(rtp_folder_name)
+copyfile(argv[0].split('/')[len(argv[0].split('/'))-1], rtp_folder_name + argv[0].split('/')[len(argv[0].split('/'))-1])
 
 # write RTPs to rtp.txt
-with open(rtp_name + 'rtp.txt', 'w') as rtp_f:
-	rtp_f.write('<D> embedding parameters (50): %d\n' % rtp_discriminator_n_embedding)
-	rtp_f.write('<D> hidden layers1 (0): %d\n' % rtp_d_hidden_layers1)
-	rtp_f.write('<D> hidden units1 (0): %d\n' % rtp_d_hidden_units1)
-	rtp_f.write('<D> leaky ReLU alpha (0.2): %.05f\n' % rtp_d_LeReLU_alpha)
-	rtp_f.write('<D> convolution filters (128): %d\n' % rtp_d_conv_filters)
-	rtp_f.write('<G> embedding parameters (50): %d\n' % rtp_generator_n_embedding)
-	rtp_f.write('<G> hidden layers1 (1): %d\n' % rtp_g_hidden_layers1)
-	rtp_f.write('<G> hidden layers2 (1): %d\n' % rtp_g_hidden_layers2)
-	rtp_f.write('<G> hidden units2 (128): %d\n' % rtp_g_hidden_units_mult2)
-	rtp_f.write('<G> deconvolution filters (128): %d\n' % rtp_g_deconv_filters)
-	rtp_f.write('<G> leaky ReLU alpha (0.2): %.05f\n' % rtp_g_LeReLU_alpha)
-	rtp_f.write('Learning rate (0.0002): %.05f\n' % rtp_learn_rate)
-	rtp_f.write('n_classes: %d\n' % rtp_n_classes)
-
+for i, conf in enumerate(rtp_conf_list):
+	with open(rtp_folder_name + 'rtp%d.txt' % i, 'w') as rtp_f:
+		rtp_f.write('<D> embedding parameters (50):%d\n' % conf['d_embedding'])
+		rtp_f.write('<D> hidden layers1 (0):%d\n' % conf['d_hidden_layers1'])
+		rtp_f.write('<D> hidden units1 (0):%d\n' % conf['d_hidden_units1'])
+		rtp_f.write('<D> leaky ReLU alpha (0.2):%.05f\n' % conf['d_LeReLU_alpha'])
+		rtp_f.write('<D> convolution filters (128):%d\n' % conf['d_conv_filters'])
+		rtp_f.write('<G> embedding parameters (50):%d\n' % conf['g_embedding'])
+		rtp_f.write('<G> hidden layers1 (1):%d\n' % conf['g_hidden_layers1'])
+		rtp_f.write('<G> hidden layers2 (1):%d\n' % conf['g_hidden_layers2'])
+		rtp_f.write('<G> hidden units2 (128):%d\n' % conf['g_hidden_units_mult2'])
+		rtp_f.write('<G> deconvolution filters (128):%d\n' % conf['g_deconv_filters'])
+		rtp_f.write('<G> leaky ReLU alpha (0.2):%.05f\n' % conf['g_LeReLU_alpha'])
+		rtp_f.write('Learning rate (0.0002):%.05f\n' % conf['learn_rate'])
+		rtp_f.write('n_classes:%d\n' % rtp_n_classes)
 
 
 # scale an array of images to a new size
@@ -152,7 +175,7 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 	pyplot.ylabel("euclidean distance")
 	pyplot.tight_layout()
 	pyplot.ylim(bottom=0)
-	pyplot.savefig(rtp_name + 'euclid_plot_%d' % epoch)
+	pyplot.savefig(rtp_folder_name + 'euclid_plot_%d' % epoch)
 
 
 # create and save a plot of generated images
@@ -168,7 +191,7 @@ def save_plot(examples, epoch, rows, cols):
 		# plot raw pixel data
 		pyplot.imshow(examples[i, :, :, 0], cmap='gray_r')
 	pyplot.subplots_adjust(wspace=0, hspace=0, left=0, right=1, bottom=0, top=1)
-	pyplot.savefig(rtp_name + 'out_%d.png' % epoch)
+	pyplot.savefig(rtp_folder_name + 'out_%d.png' % epoch)
 
 
 # calculate frechet inception distance
@@ -196,7 +219,7 @@ def define_discriminator(in_shape=(28,28,1), n_classes=rtp_n_classes):
 	# label input
 	in_label = Input(shape=(1,))
 	# embedding for categorical input
-	li = Embedding(n_classes, rtp_discriminator_n_embedding)(in_label)
+	li = Embedding(n_classes, rtp_conf_list[rtp_list_index]['d_embedding'])(in_label)
 	# scale up to image dimensions with linear activation
 	n_nodes = in_shape[0] * in_shape[1]
 	li = Dense(n_nodes)(li)
@@ -208,28 +231,28 @@ def define_discriminator(in_shape=(28,28,1), n_classes=rtp_n_classes):
 	merge = Concatenate()([in_image, li])
 	#print(merge.shape)
 	# downsample
-	fe = Conv2D(rtp_d_conv_filters, (3,3), strides=(2,2), padding='same')(merge)
+	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(2,2), padding='same')(merge)
 	#print(fe.shape)
-	fe = LeakyReLU(alpha=rtp_d_LeReLU_alpha)(fe)
+	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
 	#print(fe.shape)
 	# downsample
-	fe = Conv2D(rtp_d_conv_filters, (3,3), strides=(2,2), padding='same')(fe)
+	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(2,2), padding='same')(fe)
 	#print(fe.shape)
-	fe = LeakyReLU(alpha=rtp_d_LeReLU_alpha)(fe)
+	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
 	#print(fe.shape)
 	# flatten feature maps
 	fe = Flatten()(fe)
 	# dropout
 	fe = Dropout(0.4)(fe)
-	for i in range(rtp_d_hidden_layers1):
-		fe = Dense(rtp_d_hidden_units1)(fe)
+	for i in range(rtp_conf_list[rtp_list_index]['d_hidden_layers1']):
+		fe = Dense(rtp_conf_list[rtp_list_index]['d_hidden_units1'])(fe)
 		fe = Dropout(0.4)(fe)
 	# output
 	out_layer = Dense(1, activation='sigmoid')(fe)
 	# define model
 	model = Model([in_image, in_label], out_layer)
 	# compile model
-	opt = Adam(lr=rtp_learn_rate, beta_1=0.5)
+	opt = Adam(lr=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
 	model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 	return model
 
@@ -238,35 +261,35 @@ def define_generator(latent_dim, n_classes=rtp_n_classes):
 	# label input
 	in_label = Input(shape=(1,))
 	# embedding for categorical input
-	li = Embedding(n_classes, rtp_generator_n_embedding)(in_label)
+	li = Embedding(n_classes, rtp_conf_list[rtp_list_index]['g_embedding'])(in_label)
 	# linear multiplication
 	n_nodes = 7 * 7
-	for i in range(rtp_g_hidden_layers1):
+	for i in range(rtp_conf_list[rtp_list_index]['g_hidden_layers1']):
 		li = Dense(n_nodes)(li)
-		li = LeakyReLU(alpha=rtp_g_LeReLU_alpha)(li)
+		li = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(li)
 	# reshape to additional channel
 	li = Reshape((7, 7, 1))(li)
 	
 	# image generator input
 	in_lat = Input(shape=(latent_dim,))
 	# foundation for 7x7 image
-	n_nodes = rtp_g_hidden_units_mult2 * 7 * 7
+	n_nodes = rtp_conf_list[rtp_list_index]['g_hidden_units_mult2'] * 7 * 7
 	gen = Dense(n_nodes)(in_lat)
-	gen = LeakyReLU(alpha=rtp_g_LeReLU_alpha)(gen)
-	for i in range(rtp_g_hidden_layers2-1):
+	gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
+	for i in range(rtp_conf_list[rtp_list_index]['g_hidden_layers2']-1):
 		gen = Dense(n_nodes)(gen)
-		gen = LeakyReLU(alpha=rtp_g_LeReLU_alpha)(gen)
-	gen = Reshape((7, 7, rtp_g_hidden_units_mult2))(gen)
+		gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
+	gen = Reshape((7, 7, rtp_conf_list[rtp_list_index]['g_hidden_units_mult2']))(gen)
 	
 	# merge image gen and label input
 	merge = Concatenate()([gen, li])
 	# upsample to 14x14
-	gen = Conv2DTranspose(rtp_g_deconv_filters, (4,4), strides=(2,2), padding='same')(merge)
-	gen = LeakyReLU(alpha=rtp_g_LeReLU_alpha)(gen)
+	gen = Conv2DTranspose(rtp_conf_list[rtp_list_index]['g_deconv_filters'], (4,4), strides=(2,2), padding='same')(merge)
+	gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
 	#print(gen.shape)
 	# upsample to 28x28
-	gen = Conv2DTranspose(rtp_g_deconv_filters, (4,4), strides=(2,2), padding='same')(gen)
-	gen = LeakyReLU(alpha=rtp_g_LeReLU_alpha)(gen)
+	gen = Conv2DTranspose(rtp_conf_list[rtp_list_index]['g_deconv_filters'], (4,4), strides=(2,2), padding='same')(gen)
+	gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
 	#print(gen.shape)
 	# output
 	out_layer = Conv2D(1, (7,7), activation='tanh', padding='same')(gen)
@@ -288,7 +311,7 @@ def define_gan(g_model, d_model):
 	# define gan model as taking noise and label and outputting a classification
 	model = Model([gen_noise, gen_label], gan_output)
 	# compile model
-	opt = Adam(lr=rtp_learn_rate, beta_1=0.5)
+	opt = Adam(lr=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
 	model.compile(loss='binary_crossentropy', optimizer=opt)
 	return model
 
@@ -388,7 +411,7 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 				file_str = '%.3f, %.3f, %.3f, %.3f, %.3f, %.03f\n' % (d_loss1, d_loss2, g_loss, acc1, acc2, fid)
 			else:
 				file_str = '%.3f, %.3f, %.3f, %.3f, %.3f\n' % (d_loss1, d_loss2, g_loss, acc1, acc2)
-			with open(rtp_name + 'results_csv.txt', 'a') as file:
+			with open(rtp_folder_name + 'results_csv.txt', 'a') as file:
 				file.write(file_str)
 
 			# summarize loss on this batch
@@ -424,39 +447,43 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 
 		# save the generator model
 		f_name = '%d.h5' % (i + 1)
-		g_model.save(rtp_name + f_name)
+		g_model.save(rtp_folder_name + f_name)
 
 # size of the latent space
 latent_dim = 100
-# create the discriminator
-d_model = define_discriminator()
-# create the generator
-g_model = define_generator(latent_dim)
-# create the gan
-gan_model = define_gan(g_model, d_model)
-
-# Change working directory
-#os.chdir(rtp_name + '/') # does not work with emnist
-
-plot_model(d_model, to_file=(rtp_name + 'd_model.png'), show_shapes=True)
-plot_model(g_model, to_file=(rtp_name + 'g_model.png'), show_shapes=True)
-
-if (visualize == 'y'):
-	d_model.summary()
-	input('\npress enter...')
-	g_model.summary()
-	input("\npress enter...")
-	quit()
-
+# prepare the inception v3 model
+fid_model = InceptionV3(include_top=False, pooling='avg', input_shape=(299,299,3))
 # load image data
 dataset = load_real_samples()
 
-#overwrite csv files
-with open(rtp_name + 'results_csv.txt', 'w') as file:
-	file.write('')
 
-# prepare the inception v3 model
-fid_model = InceptionV3(include_top=False, pooling='avg', input_shape=(299,299,3))
+for i,conf in enumerate(rtp_conf_list):
+	rtp_list_index = i
+	rtp_folder_name = rtp_root_folder + str(rtp_list_index) + '/'
+	os.makedirs(rtp_folder_name)
+	# create the discriminator
+	d_model = define_discriminator()
+	# create the generator
+	g_model = define_generator(latent_dim)
+	# create the gan
+	gan_model = define_gan(g_model, d_model)
 
-# train model
-train(g_model, d_model, gan_model, dataset, latent_dim, fid_model)
+	# Change working directory
+	#os.chdir(rtp_folder_name + '/') # does not work with emnist
+
+	plot_model(d_model, to_file=(rtp_folder_name + 'd_model.png'), show_shapes=True)
+	plot_model(g_model, to_file=(rtp_folder_name + 'g_model.png'), show_shapes=True)
+
+	if (visualize == 'y'):
+		d_model.summary()
+		input('\npress enter...')
+		g_model.summary()
+		input("\npress enter...")
+		quit()
+
+	#overwrite csv files
+	with open(rtp_folder_name + 'results_csv.txt', 'w') as file:
+		file.write('')
+
+	# train model
+	train(g_model, d_model, gan_model, dataset, latent_dim, fid_model)
