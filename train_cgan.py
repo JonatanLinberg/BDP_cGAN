@@ -51,7 +51,8 @@ mndata.gz = True
 ################################
 # rtp_ = runtime parameter
 # Folder and filename
-rtp_name = input("enter name: ") + '/'
+rtp_folder_name = input("enter name: ") + '/'
+rtp_root_folder = rtp_folder_name
 # Dataset
 # Note! Training or testing is set in the load_real_samples function
 mndata.select_emnist('balanced')	# 'balanced', 'byclass'...
@@ -125,12 +126,12 @@ rtp_train_n_batch = 128		# multiple of 16
 rtp_train_n_epochs = 200
 
 # Create directory for next run
-os.makedirs(rtp_name)
-copyfile(argv[0], rtp_name + argv[0])
+os.makedirs(rtp_folder_name)
+copyfile(argv[0], rtp_folder_name + argv[0])
 
 # write RTPs to rtp.txt
 for i, conf in enumerate(rtp_conf_list):
-	with open(rtp_name + 'rtp%d.txt' % i, 'w') as rtp_f:
+	with open(rtp_folder_name + 'rtp%d.txt' % i, 'w') as rtp_f:
 		rtp_f.write('<D> embedding parameters (50):%d\n' % conf['d_embedding'])
 		rtp_f.write('<D> hidden layers1 (0):%d\n' % conf['d_hidden_layers1'])
 		rtp_f.write('<D> hidden units1 (0):%d\n' % conf['d_hidden_units1'])
@@ -174,7 +175,7 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 	pyplot.ylabel("euclidean distance")
 	pyplot.tight_layout()
 	pyplot.ylim(bottom=0)
-	pyplot.savefig(rtp_name + 'euclid_plot_%d' % epoch)
+	pyplot.savefig(rtp_folder_name + 'euclid_plot_%d' % epoch)
 
 
 # create and save a plot of generated images
@@ -190,7 +191,7 @@ def save_plot(examples, epoch, rows, cols):
 		# plot raw pixel data
 		pyplot.imshow(examples[i, :, :, 0], cmap='gray_r')
 	pyplot.subplots_adjust(wspace=0, hspace=0, left=0, right=1, bottom=0, top=1)
-	pyplot.savefig(rtp_name + 'out_%d.png' % epoch)
+	pyplot.savefig(rtp_folder_name + 'out_%d.png' % epoch)
 
 
 # calculate frechet inception distance
@@ -410,7 +411,7 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 				file_str = '%.3f, %.3f, %.3f, %.3f, %.3f, %.03f\n' % (d_loss1, d_loss2, g_loss, acc1, acc2, fid)
 			else:
 				file_str = '%.3f, %.3f, %.3f, %.3f, %.3f\n' % (d_loss1, d_loss2, g_loss, acc1, acc2)
-			with open(rtp_name + 'results_csv.txt', 'a') as file:
+			with open(rtp_folder_name + 'results_csv.txt', 'a') as file:
 				file.write(file_str)
 
 			# summarize loss on this batch
@@ -446,39 +447,43 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 
 		# save the generator model
 		f_name = '%d.h5' % (i + 1)
-		g_model.save(rtp_name + f_name)
+		g_model.save(rtp_folder_name + f_name)
 
 # size of the latent space
 latent_dim = 100
-# create the discriminator
-d_model = define_discriminator()
-# create the generator
-g_model = define_generator(latent_dim)
-# create the gan
-gan_model = define_gan(g_model, d_model)
-
-# Change working directory
-#os.chdir(rtp_name + '/') # does not work with emnist
-
-plot_model(d_model, to_file=(rtp_name + 'd_model.png'), show_shapes=True)
-plot_model(g_model, to_file=(rtp_name + 'g_model.png'), show_shapes=True)
-
-if (visualize == 'y'):
-	d_model.summary()
-	input('\npress enter...')
-	g_model.summary()
-	input("\npress enter...")
-	quit()
-
+# prepare the inception v3 model
+fid_model = InceptionV3(include_top=False, pooling='avg', input_shape=(299,299,3))
 # load image data
 dataset = load_real_samples()
 
-#overwrite csv files
-with open(rtp_name + 'results_csv.txt', 'w') as file:
-	file.write('')
 
-# prepare the inception v3 model
-fid_model = InceptionV3(include_top=False, pooling='avg', input_shape=(299,299,3))
+for i,conf in enumerate(rtp_conf_list):
+	rtp_list_index = i
+	rtp_folder_name = rtp_root_folder + str(rtp_list_index) + '/'
+	os.makedirs(rtp_folder_name)
+	# create the discriminator
+	d_model = define_discriminator()
+	# create the generator
+	g_model = define_generator(latent_dim)
+	# create the gan
+	gan_model = define_gan(g_model, d_model)
 
-# train model
-train(g_model, d_model, gan_model, dataset, latent_dim, fid_model)
+	# Change working directory
+	#os.chdir(rtp_folder_name + '/') # does not work with emnist
+
+	plot_model(d_model, to_file=(rtp_folder_name + 'd_model.png'), show_shapes=True)
+	plot_model(g_model, to_file=(rtp_folder_name + 'g_model.png'), show_shapes=True)
+
+	if (visualize == 'y'):
+		d_model.summary()
+		input('\npress enter...')
+		g_model.summary()
+		input("\npress enter...")
+		quit()
+
+	#overwrite csv files
+	with open(rtp_folder_name + 'results_csv.txt', 'w') as file:
+		file.write('')
+
+	# train model
+	train(g_model, d_model, gan_model, dataset, latent_dim, fid_model)
