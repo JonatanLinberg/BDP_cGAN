@@ -67,7 +67,7 @@ rtp_conf = namedtuple('rtp_conf', [	'd_embedding',
 									'g_hidden_layers1',
 									'g_hidden_layers2',
 									'g_hidden_units_mult2',
-									'g_decónv_filters',
+									'g_deconv_filters',
 									'g_LeReLU_alpha',
 									'learn_rate'])
 rtp_conf_list = []
@@ -129,19 +129,20 @@ copyfile(argv[0], rtp_name + argv[0])
 
 # write RTPs to rtp.txt
 with open(rtp_name + 'rtp.txt', 'w') as rtp_f:
-	rtp_f.write('<D> embedding parameters (50): %d\n' % rtp_discriminator_n_embedding)
-	rtp_f.write('<D> hidden layers1 (0): %d\n' % rtp_d_hidden_layers1)
-	rtp_f.write('<D> hidden units1 (0): %d\n' % rtp_d_hidden_units1)
-	rtp_f.write('<D> leaky ReLU alpha (0.2): %.05f\n' % rtp_d_LeReLU_alpha)
-	rtp_f.write('<D> convolution filters (128): %d\n' % rtp_d_conv_filters)
-	rtp_f.write('<G> embedding parameters (50): %d\n' % rtp_generator_n_embedding)
-	rtp_f.write('<G> hidden layers1 (1): %d\n' % rtp_g_hidden_layers1)
-	rtp_f.write('<G> hidden layers2 (1): %d\n' % rtp_g_hidden_layers2)
-	rtp_f.write('<G> hidden units2 (128): %d\n' % rtp_g_hidden_units_mult2)
-	rtp_f.write('<G> deconvolution filters (128): %d\n' % rtp_g_deconv_filters)
-	rtp_f.write('<G> leaky ReLU alpha (0.2): %.05f\n' % rtp_g_LeReLU_alpha)
-	rtp_f.write('Learning rate (0.0002): %.05f\n' % rtp_learn_rate)
-	rtp_f.write('n_classes: %d\n' % rtp_n_classes)
+	for conf in rtp_conf_list:
+		rtp_f.write('<D> embedding parameters (50): %d\n' % conf.d_embedding)
+		rtp_f.write('<D> hidden layers1 (0): %d\n' % conf.d_hidden_layers1)
+		rtp_f.write('<D> hidden units1 (0): %d\n' % conf.d_hidden_units1)
+		rtp_f.write('<D> leaky ReLU alpha (0.2): %.05f\n' % conf.d_LeReLU_alpha)
+		rtp_f.write('<D> convolution filters (128): %d\n' % conf.d_conv_filters)
+		rtp_f.write('<G> embedding parameters (50): %d\n' % conf.g_embedding)
+		rtp_f.write('<G> hidden layers1 (1): %d\n' % conf.g_hidden_layers1)
+		rtp_f.write('<G> hidden layers2 (1): %d\n' % conf.g_hidden_layers2)
+		rtp_f.write('<G> hidden units2 (128): %d\n' % conf.g_hidden_units_mult2)
+		rtp_f.write('<G> deconvolution filters (128): %d\n' % conf.g_deconv_filters)
+		rtp_f.write('<G> leaky ReLU alpha (0.2): %.05f\n' % conf.g_LeReLU_alpha)
+		rtp_f.write('Learning rate (0.0002): %.05f\n' % conf.learn_rate)
+		rtp_f.write('n_classes: %d\n' % rtp_n_classes)
 
 
 
