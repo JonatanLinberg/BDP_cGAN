@@ -85,20 +85,17 @@ os.makedirs(rtp_name)
 copyfile(argv[0], rtp_name + argv[0])
 
 with open(rtp_name + 'rtp.txt', 'w') as rtp_f:
-	rtp_f.write(" < < Discriminator > >\n")
 	rtp_f.write('<D> embedding parameters (50): %d\n' % rtp_discriminator_n_embedding)
 	rtp_f.write('<D> hidden layers1 (0): %d\n' % rtp_d_hidden_layers1)
 	rtp_f.write('<D> hidden units1 (0): %d\n' % rtp_d_hidden_units1)
 	rtp_f.write('<D> leaky ReLU alpha (0.2): %.05f\n' % rtp_d_LeReLU_alpha)
 	rtp_f.write('<D> convolution filters (128): %d\n' % rtp_d_conv_filters)
-	rtp_f.write(" < < Generator > >\n")
 	rtp_f.write('<G> embedding parameters (50): %d\n' % rtp_generator_n_embedding)
 	rtp_f.write('<G> hidden layers1 (1): %d\n' % rtp_g_hidden_layers1)
 	rtp_f.write('<G> hidden layers2 (1): %d\n' % rtp_g_hidden_layers2)
 	rtp_f.write('<G> hidden units2 (128): %d\n' % rtp_g_hidden_units_mult2)
 	rtp_f.write('<G> deconvolution filters (128): %d\n' % rtp_g_deconv_filters)
 	rtp_f.write('<G> leaky ReLU alpha (0.2): %.05f\n' % rtp_g_LeReLU_alpha)
-	rtp_f.write(" < < Other > >\n")
 	rtp_f.write('n_classes: %d\n' % rtp_n_classes)
 	rtp_f.write('Learning rate (0.0002): %.05f\n' % rtp_learn_rate)
 
@@ -411,12 +408,7 @@ latent_dim = 100
 # create the discriminator
 d_model = define_discriminator()
 # create the generator
-
-if (len(argv) > 1):
-	g_model = load_model(argv[1])
-	print ('loading model', argv[1])
-else:
-	g_model = define_generator(latent_dim)
+g_model = define_generator(latent_dim)
 # create the gan
 gan_model = define_gan(g_model, d_model)
 
