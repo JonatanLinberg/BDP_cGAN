@@ -193,7 +193,7 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 	pyplot.ylabel("euclidean distance")
 	pyplot.tight_layout()
 	pyplot.ylim(bottom=0)
-	pyplot.savefig(rtp_folder_name + 'euclid_plot_%d' % epoch)
+	pyplot.savefig(rtp_folder_name + 'euclid_plot_%d.png' % epoch)
 
 
 # create and save a plot of generated images
