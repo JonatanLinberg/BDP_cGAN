@@ -441,8 +441,8 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 		fid_samples_real = reshape(fid_samples_real, [rtp_fid_samples*half_batch, 28, 28])
 		
 		# convert integer to floating point values
-		fid_samples_fake = X_fake.astype('float32')
-		fid_samples_real = X_real.astype('float32')
+		fid_samples_fake = fid_samples_fake.astype('float32')
+		fid_samples_real = fid_samples_real.astype('float32')
 		# resize images
 		fid_samples_fake = scale_images(fid_samples_fake, (299,299,3))
 		fid_samples_real = scale_images(fid_samples_real, (299,299,3))
