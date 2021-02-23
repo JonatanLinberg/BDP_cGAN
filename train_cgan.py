@@ -199,7 +199,7 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 # create and save a plot of generated images
 def save_plot(examples, epoch, rows, cols):
 
-	fig = pyplot.figure(figsize=(cols * (28/96), rows * (28/96)))
+	fig = pyplot.figure(figsize=(cols * (28/100), rows * (28/100)))
 	# plot images
 	for i in range(rows * cols):
 		# define subplot
