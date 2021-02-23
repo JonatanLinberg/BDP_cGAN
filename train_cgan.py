@@ -188,7 +188,7 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 			#print('x:', i%n_cl, '\ty:', index, '\tj: ', j, '\tx: ', ex_cl, '\ted: ', ed_cl, '\ti_cl: ', i_cl, '\th(x-i_cl): ', ((ex_cl-i_cl)*(ex_cl-i_cl-1)//2))
 			result[i % n_cl, index] = (norm(examples[i, :, :, 0] - examples[((j*n_cl)+(i%n_cl)), :, :, 0]))
 	eucl_fig = pyplot.figure(figsize=(12, 5), ylim=0, xlabel="class", ylabel="euclidean distance", tight_layout=True)
-	eucl_fig = pyplot.boxplot(transpose(result))
+	pyplot.boxplot(transpose(result))
 	eucl_fig.savefig(rtp_folder_name + 'euclid_plot_%d.png' % epoch)
 
 
