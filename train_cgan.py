@@ -225,7 +225,11 @@ def calculate_fid(model, images1, images2):
 	# calculate sum squared difference between means
 	ssdiff = numpy.sum((mu1 - mu2)**2.0)
 	# calculate sqrt of product between cov
-	covmean = sqrtm(sigma1.dot(sigma2))
+	print('debug pre')
+	testvar = sigma1.dot(sigma2)
+	print('debug mid') 
+	covmean = sqrtm(testvar)
+	print('debug post')
 	# check and correct imaginary numbers from sqrt
 	if iscomplexobj(covmean):
 		covmean = covmean.real
