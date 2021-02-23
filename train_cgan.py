@@ -189,7 +189,7 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 			result[i % n_cl, index] = (norm(examples[i, :, :, 0] - examples[((j*n_cl)+(i%n_cl)), :, :, 0]))
 	
 	#eucl_fig = pyplot.figure(figsize=(12, 5), ylim=0, xlabel="class", ylabel="euclidean distance", tight_layout=True)
-	eucl_fig, ax = pyplot.subplots()
+	eucl_fig, ax = pyplot.subplots(figsize=(12, 5))
 	ax.boxplot(transpose(result))
 	ax.set_ylim(bottom=0)
 	ax.set_xlabel("class")
@@ -452,7 +452,7 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 		fid_samples_fake = preprocess_input(fid_samples_fake)
 		fid_samples_real = preprocess_input(fid_samples_real)
 		# calculate fid
-		print("calculating FID with sample size n_real: %d, n_fake: %d" % (fid_samples_real.shape[0], fid_samples_fake.shape[0]))
+		print("calculating FID with sample size: n_real: %d, n_fake: %d" % (fid_samples_real.shape[0], fid_samples_fake.shape[0]))
 		fid = calculate_fid(fid_model, fid_samples_fake, fid_samples_real)
 		print(" ->->-> FID for epoch %d: %.03f" % (i + 1, fid))
 
