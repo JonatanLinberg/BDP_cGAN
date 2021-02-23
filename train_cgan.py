@@ -189,7 +189,7 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 			result[i % n_cl, index] = (norm(examples[i, :, :, 0] - examples[((j*n_cl)+(i%n_cl)), :, :, 0]))
 	eucl_fig = pyplot.figure(figsize=(12, 5), ylim=0, xlabel="class", ylabel="euclidean distance", tight_layout=True)
 	eucl_fig = pyplot.boxplot(transpose(result))
-	pyplot.savefig(rtp_folder_name + 'euclid_plot_%d.png' % epoch)
+	eucl_fig.savefig(rtp_folder_name + 'euclid_plot_%d.png' % epoch)
 
 
 # create and save a plot of generated images
@@ -205,7 +205,7 @@ def save_plot(examples, epoch, rows, cols):
 		# plot raw pixel data
 		pyplot.imshow(examples[i, :, :, 0], cmap='gray_r')
 	pyplot.subplots_adjust(wspace=0, hspace=0, left=0, right=1, bottom=0, top=1)
-	pyplot.savefig(rtp_folder_name + 'out_%d.png' % epoch)
+	fig.savefig(rtp_folder_name + 'out_%d.png' % epoch)
 
 
 # calculate frechet inception distance
