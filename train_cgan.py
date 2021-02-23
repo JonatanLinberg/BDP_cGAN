@@ -452,7 +452,7 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 		fid_samples_fake = preprocess_input(fid_samples_fake)
 		fid_samples_real = preprocess_input(fid_samples_real)
 		# calculate fid
-		print("calculating FID with sample size n_real: %d, n_fake%d" % (fid_samples_real.shape[0], fid_samples_fake.shape[0]))
+		print("calculating FID with sample size n_real: %d, n_fake: %d" % (fid_samples_real.shape[0], fid_samples_fake.shape[0]))
 		fid = calculate_fid(fid_model, fid_samples_fake, fid_samples_real)
 		print(" ->->-> FID for epoch %d: %.03f" % (i + 1, fid))
 
