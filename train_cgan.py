@@ -191,10 +191,10 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 	#eucl_fig = pyplot.figure(figsize=(12, 5), ylim=0, xlabel="class", ylabel="euclidean distance", tight_layout=True)
 	eucl_fig, ax = pyplot.subplots(figsize=(12, 5))
 	ax.boxplot(transpose(result))
-	ax.set_ylim(bottom=0)
+	#ax.set_ylim(bottom=0)
 	ax.set_xlabel("class")
 	ax.set_ylabel("euclidean distance")
-	pyplot.subplots_adjust(wspace=0, hspace=0, left=0, right=1, bottom=0, top=1)
+	#pyplot.subplots_adjust(wspace=0, hspace=0, left=0, right=1, bottom=0, top=1)
 	eucl_fig.savefig(rtp_folder_name + 'euclid_plot_%d.png' % epoch)
 
 
