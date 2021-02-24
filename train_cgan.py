@@ -188,6 +188,17 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 			#print('x:', i%n_cl, '\ty:', index, '\tj: ', j, '\tx: ', ex_cl, '\ted: ', ed_cl, '\ti_cl: ', i_cl, '\th(x-i_cl): ', ((ex_cl-i_cl)*(ex_cl-i_cl-1)//2))
 			result[i % n_cl, index] = (norm(examples[i, :, :, 0] - examples[((j*n_cl)+(i%n_cl)), :, :, 0]))
 	
+	result = transpose(result)
+	with open(rtp_folder_name + 'eucl_data_%d.txt' % epoch, 'w') as eucl_file:
+		for row in result:
+			row_str = ""
+			for i, val in enumerate(row):
+				if (i > 0):
+					row_str += ','
+				row_str += '%f' % val
+			eucl_file.write(row_str + "\n")
+	"""
+	# EUCLIDEAN BOX PLOTTING CODE 
 	#eucl_fig = pyplot.figure(figsize=(12, 5), ylim=0, xlabel="class", ylabel="euclidean distance", tight_layout=True)
 	eucl_fig, ax = pyplot.subplots(figsize=(12, 5))
 	ax.boxplot(transpose(result))
@@ -196,7 +207,7 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 	ax.set_ylabel("euclidean distance")
 	#pyplot.subplots_adjust(wspace=0, hspace=0, left=0, right=1, bottom=0, top=1)
 	eucl_fig.savefig(rtp_folder_name + 'euclid_plot_%d.png' % epoch)
-
+	"""
 
 # create and save a plot of generated images
 def save_plot(examples, epoch, rows, cols):
