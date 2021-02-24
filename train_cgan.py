@@ -119,6 +119,8 @@ else:
 
 visualize = input('Only show models (y/n): ')
 
+rtp_mode_collapse_lim = 2.0
+
 # Training parameters
 rtp_fid_samples = 40		# number of fid-batch-samples
 rtp_train_n_batch = 128		# multiple of 16
@@ -175,19 +177,35 @@ def scale_images(images, new_shape):
 		images_list.append(new_image)
 	return asarray(images_list)
 
-def save_euclidean_distance_plot(examples, n_cl, epoch):
-	n_ex = len(examples)
-	ex_cl = n_ex // n_cl
-	ed_cl = ex_cl*(ex_cl-1)//2
+# number of handshakes between 'a' people
+def n_hs(a):
+	return a*(a-1)//2
+
+def calc_euclidean_distance(examples, n_cl, epoch):
+	n_ex = len(examples)	# total examples
+	ex_cl = n_ex // n_cl	# examples per class
+	ed_cl = n_hs(ex_cl)		# number of "handshakes" per class
 	result = array(zeros((n_cl, ed_cl)), float32)
 	# all same class
 	for i in range(n_ex):
 		for j in range((i//n_cl) + 1, n_ex//n_cl):
 			i_cl = i // n_cl
-			index = (j-i_cl -1) + (ed_cl - ((ex_cl-i_cl)*(ex_cl-i_cl-1)//2))
+			index = (j-i_cl -1) + (ed_cl - n_hs(ex_cl-i_cl))
 			#print('x:', i%n_cl, '\ty:', index, '\tj: ', j, '\tx: ', ex_cl, '\ted: ', ed_cl, '\ti_cl: ', i_cl, '\th(x-i_cl): ', ((ex_cl-i_cl)*(ex_cl-i_cl-1)//2))
 			result[i % n_cl, index] = (norm(examples[i, :, :, 0] - examples[((j*n_cl)+(i%n_cl)), :, :, 0]))
 	
+	similar_arr = zeros((n_cl, ex_cl), dtype=bool)
+	for cl in range(n_cl):
+		for ex in range(ex_cl):
+			for i in range(ex_cl-ex-1):
+				if (result[cl, ed_cl-n_hs(ex_cl-ex) + i] < rtp_mode_collapse_lim):
+					similar_arr[cl, ex] = True
+					similar_arr[cl, ex+i+1] = True
+				#print("cl:%d\tex:%d\ti:%d\trow:%d" % (cl, ex, i, ex+i+1))
+
+	return similar_arr
+	"""
+	# write to file
 	result = transpose(result)
 	with open(rtp_folder_name + 'eucl_data_%d.txt' % epoch, 'w') as eucl_file:
 		for row in result:
@@ -197,6 +215,7 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 					row_str += ','
 				row_str += '%f' % val
 			eucl_file.write(row_str + "\n")
+	"""
 	"""
 	# EUCLIDEAN BOX PLOTTING CODE 
 	#eucl_fig = pyplot.figure(figsize=(12, 5), ylim=0, xlabel="class", ylabel="euclidean distance", tight_layout=True)
@@ -210,8 +229,7 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 	"""
 
 # create and save a plot of generated images
-def save_plot(examples, epoch, rows, cols):
-
+def save_plot(examples, epoch, rows, cols, red_arr):
 	fig = pyplot.figure(figsize=(cols * (28/100), rows * (28/100)))
 	# plot images
 	for i in range(rows * cols):
@@ -220,7 +238,10 @@ def save_plot(examples, epoch, rows, cols):
 		# turn off axis
 		pyplot.axis('off')
 		# plot raw pixel data
-		pyplot.imshow(examples[i, :, :, 0], cmap='gray_r')
+		cmap = 'gray_r'
+		if (red_arr[i%cols, i//cols]):
+			cmap = 'Reds'
+		pyplot.imshow(examples[i, :, :, 0], cmap=cmap)
 	pyplot.subplots_adjust(wspace=0, hspace=0, left=0, right=1, bottom=0, top=1)
 	fig.savefig(rtp_folder_name + 'out_%d.png' % epoch)
 
@@ -474,8 +495,8 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 
 		out = g_model.predict([img_lat_pnt, img_lbl])
 		out = (out + 1) / 2.0
-		save_plot(out, (i + 1), img_ex_count, rtp_n_classes)
-		save_euclidean_distance_plot(out, rtp_n_classes, (i+1))
+		similar_char_arr = calc_euclidean_distance(out, rtp_n_classes, (i+1))
+		save_plot(out, (i + 1), img_ex_count, rtp_n_classes, similar_char_arr)
 
 		# save the generator model
 		f_name = '%d.h5' % (i + 1)
