@@ -187,13 +187,15 @@ def save_euclidean_distance_plot(examples, n_cl, epoch):
 			index = (j-i_cl -1) + (ed_cl - ((ex_cl-i_cl)*(ex_cl-i_cl-1)//2))
 			#print('x:', i%n_cl, '\ty:', index, '\tj: ', j, '\tx: ', ex_cl, '\ted: ', ed_cl, '\ti_cl: ', i_cl, '\th(x-i_cl): ', ((ex_cl-i_cl)*(ex_cl-i_cl-1)//2))
 			result[i % n_cl, index] = (norm(examples[i, :, :, 0] - examples[((j*n_cl)+(i%n_cl)), :, :, 0]))
-	pyplot.figure(figsize=(12, 5))
-	pyplot.boxplot(transpose(result))
-	pyplot.xlabel("class")
-	pyplot.ylabel("euclidean distance")
-	pyplot.tight_layout()
-	pyplot.ylim(bottom=0)
-	pyplot.savefig(rtp_folder_name + 'euclid_plot_%d.png' % epoch)
+	
+	#eucl_fig = pyplot.figure(figsize=(12, 5), ylim=0, xlabel="class", ylabel="euclidean distance", tight_layout=True)
+	eucl_fig, ax = pyplot.subplots(figsize=(12, 5))
+	ax.boxplot(transpose(result))
+	#ax.set_ylim(bottom=0)
+	ax.set_xlabel("class")
+	ax.set_ylabel("euclidean distance")
+	#pyplot.subplots_adjust(wspace=0, hspace=0, left=0, right=1, bottom=0, top=1)
+	eucl_fig.savefig(rtp_folder_name + 'euclid_plot_%d.png' % epoch)
 
 
 # create and save a plot of generated images
@@ -209,7 +211,7 @@ def save_plot(examples, epoch, rows, cols):
 		# plot raw pixel data
 		pyplot.imshow(examples[i, :, :, 0], cmap='gray_r')
 	pyplot.subplots_adjust(wspace=0, hspace=0, left=0, right=1, bottom=0, top=1)
-	pyplot.savefig(rtp_folder_name + 'out_%d.png' % epoch)
+	fig.savefig(rtp_folder_name + 'out_%d.png' % epoch)
 
 
 # calculate frechet inception distance
@@ -450,8 +452,9 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 		fid_samples_fake = preprocess_input(fid_samples_fake)
 		fid_samples_real = preprocess_input(fid_samples_real)
 		# calculate fid
+		print("calculating FID with sample size: n_real: %d, n_fake: %d" % (fid_samples_real.shape[0], fid_samples_fake.shape[0]))
 		fid = calculate_fid(fid_model, fid_samples_fake, fid_samples_real)
-		print(" ->->-> FID for epoch %d: %.03f\n\t(n_real: %d, n_fake%d)" % (i + 1, fid, fid_samples_real.shape[0], fid_samples_fake.shape[0]))
+		print(" ->->-> FID for epoch %d: %.03f" % (i + 1, fid))
 
 		img_ex_count = 10
 		[img_lat_pnt, img_lbl] = generate_latent_points(latent_dim, img_ex_count*rtp_n_classes)
