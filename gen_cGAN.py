@@ -154,6 +154,8 @@ while (n_classes == 47):
 		new_text = input("Write text here: ").split()
 		if (new_text != []):
 			text = new_text
+	else:
+		text = in_text
 	n_cols = 0
 	for word in text:
 		if (len(word) > n_cols):
