@@ -44,6 +44,7 @@ def to_label(in_lbl):
 					return i
 		elif (in_lbl == a):
 			return i
+	return 0
 
 # generate points in latent space as input for the generator
 def generate_latent_points(latent_dim, n_samples):
