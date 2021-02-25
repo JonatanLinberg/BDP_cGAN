@@ -177,8 +177,9 @@ for i, conf in enumerate(rtp_conf_list):
 		rtp_f.write('<G> leaky ReLU alpha (0.2):%f\n' % conf['g_LeReLU_alpha'])
 		rtp_f.write('Learning rate (0.0002):%f\n' % conf['learn_rate'])
 		rtp_f.write('SGD (y/n):' + conf['SGD'] + '\n')
-		rtp_f.write('SGD momentum (0.0):%f\n' % conf['SGD_momentum'])
-		rtp_f.write('SGD nesterov (y/n):' + conf['SGD'] + '\n')
+		if (conf['SGD'] == 'y'):
+			rtp_f.write('SGD momentum (0.0):%f\n' % conf['SGD_momentum'])
+			rtp_f.write('SGD nesterov (y/n):' + conf['SGD'] + '\n')
 		rtp_f.write('n_classes:%d\n' % rtp_n_classes)
 
 
