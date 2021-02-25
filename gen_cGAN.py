@@ -75,7 +75,7 @@ eucl = False
 f_name = ""
 n_classes = 0
 rows = 10
-text = None
+in_text = None
 
 # load model
 if (len(argv) > 1):
@@ -104,9 +104,10 @@ if (len(argv) > 1):
 						f_name = ""
 				elif (opt == 't'):
 					try:
-						text = argv[i+1].split()
+						in_text = argv[i+1].split()
 					except:
 						print('Invalid text string!\nusage:\n\t"py gen_cGAN.py -t <text to write>"')
+						in_text = ""
 						
 
 if (f_name == ""):
@@ -116,7 +117,7 @@ if (n_classes == 0):
 
 model = load_model(f_name)
 
-while(text == None):
+while(in_text == None):
 	# generate images
 	latent_points, _ = generate_latent_points(100, rows*n_classes)
 	# specify labels
@@ -149,6 +150,10 @@ while(text == None):
 
 # text string is not None
 while (n_classes == 47):
+	if (in_text == ""):
+		text = input("Write text here: ")
+	else:
+		text = in_text
 	n_cols = 0
 	for word in text:
 		if (len(word) > n_cols):
