@@ -69,6 +69,8 @@ rtp_def_conf = {'d_embedding':50,
 				'g_hidden_units_mult2':128,
 				'g_deconv_filters':128,
 				'g_LeReLU_alpha':0.2,
+				'SGD':False,
+				'SGD_momentum':0.0,
 				'learn_rate':0.0002}
 rtp_conf_list = []
 rtp_list_index = 0
@@ -89,6 +91,9 @@ if (len(argv) > 1): # linked rtp-file
 		rtp_conf['g_deconv_filters'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf['g_LeReLU_alpha'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		# other
+		rtp_conf['SGD'] = rtp_file.readline().strip()
+		if (rtp_conf['SGD'] == 'y'):
+			rtp_conf['SGD_momentum'] = literal_eval(rtp_file.readline().strip())
 		rtp_conf['learn_rate'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf_list.append(rtp_conf)
 else:
@@ -110,6 +115,9 @@ else:
 		rtp_conf['g_LeReLU_alpha'] = literal_eval(input('<G> leaky ReLU alpha (0.2): ').strip())
 
 		print(" < < Other > >")
+		rtp_conf['SGD'] = input('SGD (y/n): ').strip()
+		if (rtp_conf['SGD'] == 'y'):
+			rtp_conf['SGD_momentum'] = literal_eval(input('SGD momentum (0.0): ').strip())
 		rtp_conf['learn_rate'] = float(input('Learning rate (0.0002): ').strip())
 		rtp_conf_list.append(rtp_conf)
 	except: 
@@ -117,7 +125,7 @@ else:
 		rtp_conf_list.append(rtp_def_conf)
 
 
-visualize = input('Only show models (y/n): ')
+visualize = (input('Only show models (y/n): ') == 'y')
 
 # Training parameters
 rtp_fid_samples = 40		# number of fid-batch-samples
@@ -153,15 +161,17 @@ for i, conf in enumerate(rtp_conf_list):
 		rtp_f.write('<D> embedding parameters (50):%d\n' % conf['d_embedding'])
 		rtp_f.write('<D> hidden layers1 (0):%d\n' % conf['d_hidden_layers1'])
 		rtp_f.write('<D> hidden units1 (0):%d\n' % conf['d_hidden_units1'])
-		rtp_f.write('<D> leaky ReLU alpha (0.2):%.05f\n' % conf['d_LeReLU_alpha'])
+		rtp_f.write('<D> leaky ReLU alpha (0.2):%f\n' % conf['d_LeReLU_alpha'])
 		rtp_f.write('<D> convolution filters (128):%d\n' % conf['d_conv_filters'])
 		rtp_f.write('<G> embedding parameters (50):%d\n' % conf['g_embedding'])
 		rtp_f.write('<G> hidden layers1 (1):%d\n' % conf['g_hidden_layers1'])
 		rtp_f.write('<G> hidden layers2 (1):%d\n' % conf['g_hidden_layers2'])
 		rtp_f.write('<G> hidden units2 (128):%d\n' % conf['g_hidden_units_mult2'])
 		rtp_f.write('<G> deconvolution filters (128):%d\n' % conf['g_deconv_filters'])
-		rtp_f.write('<G> leaky ReLU alpha (0.2):%.05f\n' % conf['g_LeReLU_alpha'])
-		rtp_f.write('Learning rate (0.0002):%.05f\n' % conf['learn_rate'])
+		rtp_f.write('<G> leaky ReLU alpha (0.2):%f\n' % conf['g_LeReLU_alpha'])
+		rtp_f.write('Learning rate (0.0002):%f\n' % conf['learn_rate'])
+		rtp_f.write('SGD (y/n):', conf['SGD'])
+		rtp_f.write('SGD momentum (0.0):%f' % conf['SGD_momentum'])		
 		rtp_f.write('n_classes:%d\n' % rtp_n_classes)
 
 
@@ -495,7 +505,7 @@ for i,conf in enumerate(rtp_conf_list):
 	plot_model(d_model, to_file=(rtp_folder_name + 'd_model.png'), show_shapes=True)
 	plot_model(g_model, to_file=(rtp_folder_name + 'g_model.png'), show_shapes=True)
 
-	if (visualize == 'y'):
+	if (visualize):
 		d_model.summary()
 		input('\npress enter...')
 		g_model.summary()
