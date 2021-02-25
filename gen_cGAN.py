@@ -106,8 +106,7 @@ if (len(argv) > 1):
 					try:
 						in_text = argv[i+1].split()
 					except:
-						print('Invalid text string!\nusage:\n\t"py gen_cGAN.py -t <text to write>"')
-						in_text = ""
+						in_text = []
 						
 
 if (f_name == ""):
@@ -148,12 +147,13 @@ while(in_text == None):
 	else:
 		save_plot(out, rows, n_classes)
 
+text = ['this', 'is', 'placeholder', 'text']
 # text string is not None
 while (n_classes == 47):
-	if (in_text == ""):
-		text = input("Write text here: ")
-	else:
-		text = in_text
+	if (in_text == []):
+		new_text = input("Write text here: ").split()
+		if (new_text != []):
+			text = new_text
 	n_cols = 0
 	for word in text:
 		if (len(word) > n_cols):
