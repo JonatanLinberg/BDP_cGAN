@@ -35,7 +35,11 @@ if (len(argv) > 1):
 	f_name = argv[1]
 else:
 	f_name = input("Enter generator model (.h5) file: ")
-model = load_model(f_name)
+try:
+	model = load_model(f_name)
+except:
+	print("Cannot read model file")
+	quit()
 
 fig_update_interval = 300
 n_latent_dim = 100
@@ -67,7 +71,10 @@ class GuiGen(tk.Frame):
 		n_rows = (n_latent_dim//n_slider_frames)
 		for i, dim in enumerate(self.lat_pt[0]):
 			c_delta = i % n_rows
-			c_str = '{0:06x}'.format(16777215-int(c_delta*256/n_rows*16**4 + c_delta*256/n_rows*16**2 + c_delta*256/n_rows))
+			c_r = int(127 + 64 * ((c_delta%3))) % 256
+			c_g = int(127 + 64 * ((c_delta+1)%3)) % 256
+			c_b = int(127 + 64 * ((c_delta+2)%3)) % 256
+			c_str = '{0:06x}'.format(c_r*(16**4) + c_g*(16**2) + c_b)
 			slider = tk.Scale(self.slider_frames[i//n_rows], bg='#'+c_str, from_=-3 * lat_scale, to=3 * lat_scale, length=col_w, orient=tk.HORIZONTAL, command=partial(self.update_latent_var, i))
 			slider.set(dim * lat_scale)
 			slider.pack()
