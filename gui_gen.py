@@ -1,3 +1,4 @@
+# Use Tkinter for python 2, tkinter for python 3
 import tkinter as tk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg as fig_to_tk
 from matplotlib import pyplot
@@ -15,7 +16,8 @@ def generate_latent_point(latent_dim):
 	z_input = x_input.reshape(1, latent_dim)
 	return z_input
 
-def generate_figure(model, latent_point, class_label, frame):
+
+def generate_figure(model, latent_point, class_label):
 	label = zeros((1,), dtype=int)
 	label[0] = class_label
 	out = model.predict([latent_point, label])
@@ -31,63 +33,66 @@ else:
 	f_name = input("Enter generator model (.h5) file: ")
 model = load_model(f_name)
 
-root = tk.Tk()
-n_classes = 47
-lat_dim = 100
+
+n_latent_dim = 100
 n_slider_frames = 4
-lat_pt = generate_latent_point(lat_dim)
-char_class = 10
-live = False
+n_classes = 47
 col_w = 300
-col_h = 700
+col_h = 1000
 red = "#b55"
 green = "#4a6"
 
-def update_fig():
-	pass
+class GuiGen(tk.Frame):
+	def __init__(self, parent):
+		self.parent = parent
+		self.frame = tk.Frame(parent)
+		self.frame.pack(side="top", fill="both", expand=True)
+		self.lat_pt = generate_latent_point(n_latent_dim)
+		self.char_class = 10
+		self.live = False
+		self.createGUI()
 
-def update_latent_dim(i, new_val):
-	lat_pt[0, i] = float(new_val.replace(',','.'))
-	if (live):
-		update_fig()
+	def createGUI(self):
+		# create slider frames and sliders
+		self.slider_frames = []
+		for i in range(n_slider_frames):
+			self.slider_frames.append(tk.Frame(self.frame, width=col_w, height=col_h))
+			self.slider_frames[i].pack(side='left')
 
-def change_class(new_class):
-	global char_class
-	char_class = new_class
-	if (live):
-		update_fig()
+		self.slider_vars = []
+		for i, dim in enumerate(self.lat_pt[0]):
+			c = tk.DoubleVar()
+			slider = tk.Scale(self.slider_frames[i//(n_latent_dim//n_slider_frames)], variable=c, from_=-3, to=3, resolution=0.001, length=col_w, repeatdelay=300, orient=tk.HORIZONTAL)
+			c.set(dim)
+			self.slider_vars.append(c)
+			slider.pack()
 
-def toggle_live():
-	global live
-	live = not live
-	if (live):
-		live_btn['bg'] = live_btn['activebackground'] = green
-		update_fig()
-	else:
-		live_btn['bg'] = live_btn['activebackground'] = red
+		self.char_frame = tk.Frame(self.frame, width=col_w, height=col_h)
+		self.char_frame.pack(side='left')
+		self.class_slider = tk.Scale(self.char_frame, from_=1, to=n_classes, label="Class ID",orient=tk.HORIZONTAL)
+		self.class_slider.set(self.char_class)
+		self.class_slider.pack()
+		self.live_btn = tk.Button(self.char_frame, text='Toggle Live Update', command=self.toggle_live, bg=red, activebackground=red)
+		self.live_btn.pack()
+
+	def toggle_live(self):
+		self.live = not self.live
+		if (self.live):
+			self.live_btn['bg'] = self.live_btn['activebackground'] = green
+		else:
+			self.live_btn['bg'] = self.live_btn['activebackground'] = red
 
 
+	def slider_test(self, sliderID):
+		self.slider_vars[sliderID] = randn(1)
+		self.after(1, self.slider_test)
 
-slider_frames = []
-for i in range(n_slider_frames):
-	slider_frames.append(tk.Frame(root))
-	slider_frames[i].pack(side='left')
+	def mainloop(self):
+		self.parent.mainloop()
 
 
-for i, dim in enumerate(lat_pt[0]):
-	slider = tk.Scale(slider_frames[i // (lat_dim//n_slider_frames)], from_=-3, to=3, resolution=0.001, length=col_w, repeatdelay=300, orient=tk.HORIZONTAL, command=partial(update_latent_dim, i))
-	slider.set(dim)
-	slider.pack()
+        
 
-char_frame = tk.Frame(root, width=col_w, height=col_h)
-char_frame.pack(side='left')
-char_frame.pack_propagate(0)
-class_slider = tk.Scale(char_frame, from_=1, to=n_classes, label="Class ID",orient=tk.HORIZONTAL, command=change_class)
-class_slider.set(char_class)
-class_slider.pack()
-live_btn = tk.Button(char_frame, text='Toggle Live Update', command=toggle_live, bg=red, activebackground=red)
-live_btn.pack()
-
-update_fig()
-
-root.mainloop()
+if __name__ == "__main__":
+	root = tk.Tk()
+	GuiGen(root).mainloop()
