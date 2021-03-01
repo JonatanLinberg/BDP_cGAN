@@ -136,10 +136,10 @@ visualize = (input('Only show models (y/n): ') == 'y')
 rtp_mode_collapse_lim = 2.0
 
 # Training parameters
-rtp_fid_samples = 40		# number of fid-batch-samples
+rtp_fid_samples = 25		# number of fid-batch-samples
 rtp_train_n_batch = 128		# multiple of 16
 # > > > rtp_train_n_batch * rtp_fid_samples ≈ 5120
-rtp_train_n_epochs = 200
+rtp_train_n_epochs = 100
 
 def untuple_list(l1):
 	l2 = []
