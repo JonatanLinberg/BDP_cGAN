@@ -76,8 +76,9 @@ rtp_def_conf = {'d_embedding':50,
 				'learn_rate':0.0002}
 rtp_conf_list = []
 rtp_list_index = 0
-if (len(argv) > 1): # linked rtp-file
-	with open(argv[1], 'r') as rtp_file:
+for argi in range(1, len(argv)): # linked rtp-file
+	print('Reading RTPs from file: ', argv[argi])
+	with open(argv[argi], 'r') as rtp_file:
 		# Discriminator parameters
 		rtp_conf = {}
 		rtp_conf['d_embedding'] = literal_eval(rtp_file.readline().split(':')[1].strip())
@@ -99,7 +100,8 @@ if (len(argv) > 1): # linked rtp-file
 			rtp_conf['SGD_nesterov'] = rtp_file.readline().split(':')[1].strip()
 		rtp_conf['learn_rate'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf_list.append(rtp_conf)
-else:
+
+if (len(rtp_conf_list) == 0):
 	try:# Discriminator parameters
 		rtp_conf = {}
 		print(" < < Discriminator > >")
@@ -175,11 +177,11 @@ for i, conf in enumerate(rtp_conf_list):
 		rtp_f.write('<G> hidden units2 (128):%d\n' % conf['g_hidden_units_mult2'])
 		rtp_f.write('<G> deconvolution filters (128):%d\n' % conf['g_deconv_filters'])
 		rtp_f.write('<G> leaky ReLU alpha (0.2):%f\n' % conf['g_LeReLU_alpha'])
-		rtp_f.write('Learning rate (0.0002):%f\n' % conf['learn_rate'])
 		rtp_f.write('SGD (y/n):' + conf['SGD'] + '\n')
 		if (conf['SGD'] == 'y'):
 			rtp_f.write('SGD momentum (0.0):%f\n' % conf['SGD_momentum'])
 			rtp_f.write('SGD nesterov (y/n):' + conf['SGD'] + '\n')
+		rtp_f.write('Learning rate (0.0002):%f\n' % conf['learn_rate'])
 		rtp_f.write('n_classes:%d\n' % rtp_n_classes)
 
 
