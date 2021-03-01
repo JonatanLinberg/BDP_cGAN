@@ -13,13 +13,13 @@ from matplotlib import pyplot
 from sys import argv
 
 def plot_euclidean_distance(examples, n_cl):
-	height, width = len(examples)
-	ex_cl = height, width // n_cl
+	n_ex = len(examples)
+	ex_cl = n_ex // n_cl
 	ed_cl = ex_cl*(ex_cl-1)//2
 	result = array(zeros((n_cl, ed_cl)), float32)
 	# all same class
-	for i in range(height, width):
-		for j in range((i//n_cl) + 1, height, width//n_cl):
+	for i in range(n_ex):
+		for j in range((i//n_cl) + 1, n_ex//n_cl):
 			i_cl = i // n_cl
 			index = (j-i_cl -1) + (ed_cl - ((ex_cl-i_cl)*(ex_cl-i_cl-1)//2))
 			#print('x:', i%n_cl, '\ty:', index, '\tj: ', j, '\tx: ', ex_cl, '\ted: ', ed_cl, '\ti_cl: ', i_cl, '\th(x-i_cl): ', ((ex_cl-i_cl)*(ex_cl-i_cl-1)//2))
