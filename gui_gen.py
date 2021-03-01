@@ -9,6 +9,9 @@ from numpy.random import randn
 from numpy import zeros
 from functools import partial
 from sys import argv
+import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
+os.environ["CUDA_VISIBLE_DEVICES"] = '-1'
 from tensorflow.keras.models import load_model
 
 # generate points in latent space as input for the generator
