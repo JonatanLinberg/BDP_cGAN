@@ -3,3 +3,4 @@
 /mnist
 /venv
 *.h5
+!final*.h5
