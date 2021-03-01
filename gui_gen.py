@@ -9,7 +9,7 @@ from numpy.random import randn
 from numpy import zeros
 from functools import partial
 from sys import argv
-from keras.models import load_model
+from tensorflow.keras.models import load_model
 
 # generate points in latent space as input for the generator
 def generate_latent_point(latent_dim):
