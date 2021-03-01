@@ -13,13 +13,13 @@ from matplotlib import pyplot
 from sys import argv
 
 def plot_euclidean_distance(examples, n_cl):
-	n_ex = len(examples)
-	ex_cl = n_ex // n_cl
+	height, width = len(examples)
+	ex_cl = height, width // n_cl
 	ed_cl = ex_cl*(ex_cl-1)//2
 	result = array(zeros((n_cl, ed_cl)), float32)
 	# all same class
-	for i in range(n_ex):
-		for j in range((i//n_cl) + 1, n_ex//n_cl):
+	for i in range(height, width):
+		for j in range((i//n_cl) + 1, height, width//n_cl):
 			i_cl = i // n_cl
 			index = (j-i_cl -1) + (ed_cl - ((ex_cl-i_cl)*(ex_cl-i_cl-1)//2))
 			#print('x:', i%n_cl, '\ty:', index, '\tj: ', j, '\tx: ', ex_cl, '\ted: ', ed_cl, '\ti_cl: ', i_cl, '\th(x-i_cl): ', ((ex_cl-i_cl)*(ex_cl-i_cl-1)//2))
@@ -32,6 +32,19 @@ def plot_euclidean_distance(examples, n_cl):
 	pyplot.ylim(bottom=0)
 	pyplot.show()
 
+
+label_arr = (	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
+				'A','B',('C','c'),'D','E','F','G','H',('I','i'),('J','j'),('K','k'),('L', 'l'),('M', 'm'),'N',('O', 'o'),('P','p'),'Q','R',('S', 's'),'T',('U', 'u'),('V', 'v'),('W', 'w'),('X', 'x'),('Y', 'y'),('Z', 'z'),
+				'a','b','d','e','f','g','h','n','q','r','t')
+def to_label(in_lbl):
+	for i,a in enumerate(label_arr):
+		if (type(a) is tuple):
+			for b in a:
+				if (in_lbl == b):
+					return i
+		elif (in_lbl == a):
+			return i
+	return 0
 
 # generate points in latent space as input for the generator
 def generate_latent_points(latent_dim, n_samples):
@@ -62,6 +75,7 @@ eucl = False
 f_name = ""
 n_classes = 0
 rows = 10
+in_text = None
 
 # load model
 if (len(argv) > 1):
@@ -88,6 +102,11 @@ if (len(argv) > 1):
 					except:
 						print('Invalid file name!\nusage:\n\t"py gen_cGAN.py -f <f_name>"')
 						f_name = ""
+				elif (opt == 't'):
+					try:
+						in_text = argv[i+1].split()
+					except:
+						in_text = []
 						
 
 if (f_name == ""):
@@ -97,9 +116,9 @@ if (n_classes == 0):
 
 model = load_model(f_name)
 
-while(True):
+while(in_text == None):
 	# generate images
-	latent_points, labels = generate_latent_points(100, rows*n_classes)
+	latent_points, _ = generate_latent_points(100, rows*n_classes)
 	# specify labels
 	labels = zeros(n_classes*rows)
 	# generate images
@@ -127,3 +146,37 @@ while(True):
 		plot_euclidean_distance(out, e_classes)
 	else:
 		save_plot(out, rows, n_classes)
+
+text = ['this', 'is', 'placeholder', 'text']
+# text string is not None
+while (n_classes == 47):
+	if (in_text == []):
+		new_text = input("Write text here: ").split()
+		if (new_text != []):
+			text = new_text
+	else:
+		text = in_text
+	n_cols = 0
+	for word in text:
+		if (len(word) > n_cols):
+			n_cols = len(word)
+
+	# text to int array
+	labels = zeros((len(text), n_cols), dtype=int)
+	for i, _ in enumerate(labels):
+		for j, _ in enumerate(labels[i]):
+			try:
+				labels[i,j] = to_label(text[i][j])
+			except:
+				labels[i,j] = 0
+	height, width = labels.shape[0], labels.shape[1]
+	lat_pts, _ = generate_latent_points(100, height*width)
+	out = model.predict([lat_pts, labels.reshape(height*width)])
+	out = (out +1) / 2.0
+	for h in range(height):
+		for w in range(width):
+			if (len(text[h]) <= w):
+				out[h*width+w] = zeros((28, 28, 1), dtype=float32)
+	save_plot(out, height, width)
+
+input('Sorry, "-t" is only available for 47-class models\n')
