@@ -1,10 +1,15 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from numpy import arange
 from sys import argv
 
 filenames = []
 average_p_col = False
 df_list = []
+x_len = 0
+x_steps = 5
+col_w = 6
+col_h = 8
 
 for i in range(1, len(argv)):
 	filenames.append(argv[i])
@@ -33,8 +38,12 @@ if (average_p_col):
 	df = df / len(df_list)
 	df_list = [df]
 
+for df in df_list:
+	if (df.shape[0] > x_len):
+		x_len = df.shape[0]
+
 if (len(df_list) > 1):
-	plot, ax = plt.subplots(len(df_list), 3, figsize=(5*len(df_list), 9))
+	plot, ax = plt.subplots(len(df_list), 3, figsize=(col_w*len(df_list), col_h))
 	for i in range(len(df_list)):
 		ax[i, 0].plot(df_list[i][['d_loss_real','d_loss_fake','g_loss']])
 		ax[i, 0].legend(('d_loss_real','d_loss_fake','g_loss'))
@@ -44,13 +53,17 @@ if (len(df_list) > 1):
 		ax[i, 1].set_ylabel('accuracy')
 		ax[i, 2].plot(df_list[i]['FID'])
 		ax[i, 2].set_ylabel('FID')
-		for row in ax:
-			for a in row:
-				a.set_xlabel('number of batches')
+	for i in range(len(ax)):
+		ax[i, 0].set_title(filenames[i], loc='left')
+		for a in ax[i]:
+			a.set_xlabel('number of batches')
+			a.set_xlim(right=x_len)
+			a.set_xticks(arange(0, x_len+1, x_len//x_steps, dtype=int))
+			a.set_ylim(bottom=0)
 else:
 	choice = int(input('1. all plots\n2. loss only\n3. accuracy only\n4. FID only\nChoose: '))
 	if (choice == 1):
-		plot, sub = plt.subplots(3, figsize=(5, 9))
+		plot, sub = plt.subplots(3, figsize=(col_w, col_h))
 		sub[0].plot(df[['d_loss_real','d_loss_fake','g_loss']])
 		sub[0].legend(('d_loss_real','d_loss_fake','g_loss'))
 		sub[0].set_ylabel('loss')
@@ -75,5 +88,5 @@ else:
 		plt.xlabel('number of batches')
 		plt.ylim(bottom=0)
 
-plt.subplots_adjust(hspace=0.25, wspace=0.3)
+plt.subplots_adjust(left=0.08, right=0.92, hspace=0.5, wspace=0.2)
 plt.show()
