@@ -60,11 +60,11 @@ def generate_latent_points_not_random(latent_dim, rows, cols, map_range):
 	lps, _ = generate_latent_points(latent_dim, rows*cols)
 	lps = lps.reshape(rows, cols, latent_dim)
 	for i in range(rows):
-		val_i = map_range*(i - rows*0.5) / rows
+		val_i = map_range*(i + 0.5 - rows*0.5) / rows
 		for j in range(cols):
-			val_j = map_range*(j-cols*0.5) / cols
+			val_j = map_range*(j + 0.5 - cols*0.5) / cols
 			for k in range(latent_dim):
-				lps[i, j, k] = (k%2 * val_i + (k+1)%2 * val_j)
+				lps[i, j, k] = ((k%2 or j<=1) * val_i + ((k+1)%2 or i<=1) * val_j) + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
 	return lps.reshape(cols*rows, latent_dim)
 
 
@@ -136,14 +136,26 @@ if (n_classes == 0):
 model = load_model(f_name)
 
 while(in_text == None):
+	try:
+		in_char = input('enter char id: ')
+		char = int(in_char)
+	except ValueError:
+		char = to_label(in_char)
+	except Exception as e:
+		print(e)
+		quit()
+
 	# generate images
 	latent_points, _ = generate_latent_points(100, rows*n_classes)
 	if (lat_map_range != 0):
-		latent_points = generate_latent_points_not_random(100, rows, n_classes, lat_map_range)
+		if (char == -1):
+			for c in range(n_classes):
+				latent_points[c*rows:c*rows+rows] = generate_latent_points_not_random(100, rows, 1, lat_map_range)
+		else:
+			latent_points = generate_latent_points_not_random(100, rows, n_classes, lat_map_range)
 	# specify labels
 	labels = zeros(n_classes*rows)
 	# generate images
-	char = int(input('enter char id: '))
 #	test = asarray([17, 40, 45, 19, 50, 49, 36, 55, 36, 49])
 	labels = zeros(rows*n_classes)
 	for i in range(rows*n_classes):
