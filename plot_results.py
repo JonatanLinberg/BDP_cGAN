@@ -25,6 +25,7 @@ for file in filenames:
 	df_list.append(df)
 
 if (average_p_col):
+	print("Averaging results...")
 	df = df_list[0]
 	# sum dataframes
 	for i in range(1, len(df_list)):
@@ -35,18 +36,17 @@ if (average_p_col):
 if (len(df_list) > 1):
 	plot, ax = plt.subplots(len(df_list), 3, figsize=(5*len(df_list), 9))
 	for i in range(len(df_list)):
-		ax[i, 0].plot(df[['d_loss_real','d_loss_fake','g_loss']])
+		ax[i, 0].plot(df_list[i][['d_loss_real','d_loss_fake','g_loss']])
 		ax[i, 0].legend(('d_loss_real','d_loss_fake','g_loss'))
 		ax[i, 0].set_ylabel('loss')
-		ax[i, 1].plot(df[['d_acc_real', 'd_acc_fake']])
+		ax[i, 1].plot(df_list[i][['d_acc_real', 'd_acc_fake']])
 		ax[i, 1].legend(('d_acc_real', 'd_acc_fake'))
 		ax[i, 1].set_ylabel('accuracy')
-		ax[i, 2].plot(df['FID'])
+		ax[i, 2].plot(df_list[i]['FID'])
 		ax[i, 2].set_ylabel('FID')
 		for row in ax:
 			for a in row:
 				a.set_xlabel('number of batches')
-				a.set_ylim(bottom=0)
 else:
 	choice = int(input('1. all plots\n2. loss only\n3. accuracy only\n4. FID only\nChoose: '))
 	if (choice == 1):
@@ -75,5 +75,5 @@ else:
 		plt.xlabel('number of batches')
 		plt.ylim(bottom=0)
 
-plt.subplots_adjust(hspace=0.25)
+plt.subplots_adjust(hspace=0.25, wspace=0.3)
 plt.show()
