@@ -33,7 +33,7 @@ if (average_p_col):
 	df_list = [df]
 
 if (len(df_list) > 1):
-	plot, ax = plt.subplots(3, len(df_list), figsize=(5*len(df_list), 9))
+	plot, ax = plt.subplots(len(df_list), 3, figsize=(5*len(df_list), 9))
 	for i in range(len(df_list)):
 		ax[i, 0].plot(df[['d_loss_real','d_loss_fake','g_loss']])
 		ax[i, 0].legend(('d_loss_real','d_loss_fake','g_loss'))
