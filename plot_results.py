@@ -18,7 +18,7 @@ if (len(filenames) == 0):
 	filenames.extend(input("Enter file name(s): ").split())
 
 if (len(filenames) > 1):
-	average_p_col = int(input("1. Average results per column\n2. Show as subplots\nChoose: ")) == 1
+	average_p_col = int(input("1. Average results\n2. Show as subplots\nChoose: ")) == 1
 
 for file in filenames:
 	print("Reading", file, "as CSV file...")
