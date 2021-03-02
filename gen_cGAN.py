@@ -56,6 +56,18 @@ def generate_latent_points(latent_dim, n_samples):
 	labels = randint(0, n_classes, n_samples)
 	return [z_input, labels]
 
+def generate_latent_points_not_random(latent_dim, rows, cols, map_range):
+	lps, _ = generate_latent_points(latent_dim, rows*cols)
+	lps = lps.reshape(rows, cols, latent_dim)
+	for i in range(rows):
+		val_i = map_range*(i - rows*0.5) / rows
+		for j in range(cols):
+			val_j = map_range*(j-cols*0.5) / cols
+			for k in range(latent_dim):
+				lps[i, j, k] = (k%2 * val_i + (k+1)%2 * val_j)
+	return lps.reshape(cols*rows, latent_dim)
+
+
 # create and save a plot of generated images
 def save_plot(examples, rows, cols):
 	pyplot.figure(figsize=(cols * (28/96), rows * (28/96)))
@@ -76,6 +88,7 @@ f_name = ""
 n_classes = 0
 rows = 10
 in_text = None
+lat_map_range = 0
 
 # load model
 if (len(argv) > 1):
@@ -86,27 +99,33 @@ if (len(argv) > 1):
 					try:
 						rows = int(argv[i+1])
 					except:
-						print('Invalid number of rows!\nusage:\n\t"py gen_cGAN.py -r <number of rows>"')
+						print('Invalid number of rows!\nusage:\n\t"python gen_cGAN.py -r <number of rows>"')
 				elif (opt == 'e'):
 					eucl = True
 				elif (opt == 'c'):
 					try:
 						n_classes = int(argv[i+1])
 					except:
-						print('Invalid number of classes!\nusage:\n\t"py gen_cGAN.py -c <n_classes>"')
+						print('Invalid number of classes!\nusage:\n\t"python gen_cGAN.py -c <n_classes>"')
 						n_classes = 0
 				elif (opt == 'f'):
 					try:
 						f_name = argv[i+1]
 						open(f_name)
 					except:
-						print('Invalid file name!\nusage:\n\t"py gen_cGAN.py -f <f_name>"')
+						print('Invalid file name!\nusage:\n\t"python gen_cGAN.py -f <f_name>"')
 						f_name = ""
 				elif (opt == 't'):
 					try:
 						in_text = argv[i+1].split()
 					except:
 						in_text = []
+				elif (opt == 'L'):
+					try:
+						lat_map_range = int(argv[i+1])
+					except:
+						print('Invalid latent map range!\nusage:\n\t"python gen_cGAN.py -L <lat_map_range>"')
+
 						
 
 if (f_name == ""):
@@ -119,6 +138,8 @@ model = load_model(f_name)
 while(in_text == None):
 	# generate images
 	latent_points, _ = generate_latent_points(100, rows*n_classes)
+	if (lat_map_range != 0):
+		latent_points = generate_latent_points_not_random(100, rows, n_classes, lat_map_range)
 	# specify labels
 	labels = zeros(n_classes*rows)
 	# generate images
