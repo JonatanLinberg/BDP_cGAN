@@ -14,6 +14,7 @@ from numpy.random import randn
 from numpy.random import randint
 from numpy.linalg import norm
 import os
+# Remove # of the following two lines to prohibit usage of a GPU
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
 # os.environ["CUDA_VISIBLE_DEVICES"] = '-1'
 from matplotlib import pyplot
