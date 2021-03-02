@@ -1,4 +1,3 @@
-# example of training an conditional gan on the fashion mnist dataset
 import numpy
 from numpy import cov
 from numpy import trace
@@ -21,7 +20,6 @@ from matplotlib import pyplot
 from shutil import copyfile
 from shutil import move
 from ast import literal_eval
-from tensorflow.keras.datasets.fashion_mnist import load_data
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.models import Model
