@@ -5,6 +5,7 @@ from numpy import zeros
 from numpy import transpose
 from numpy import float32
 from numpy import append
+from numpy import full
 from numpy.linalg import norm
 from numpy.random import randn
 from numpy.random import randint
@@ -52,12 +53,14 @@ def generate_latent_points(latent_dim, n_samples):
 	x_input = randn(latent_dim * n_samples)
 	# reshape into a batch of inputs for the network
 	z_input = x_input.reshape(n_samples, latent_dim)
-	# generate labels
-	labels = randint(0, n_classes, n_samples)
-	return [z_input, labels]
+	return z_input
+
+def generate_latent_points_similar(latent_dim, n_samples):
+	pt = generate_latent_points(latent_dim, 1)
+	return (generate_latent_points(latent_dim, n_samples) / 2.5) + full((n_samples, latent_dim), pt[0])
 
 def generate_latent_points_not_random(latent_dim, rows, cols, map_range):
-	lps, _ = generate_latent_points(latent_dim, rows*cols)
+	lps = generate_latent_points(latent_dim, rows*cols)
 	lps = lps.reshape(rows, cols, latent_dim)
 	for i in range(rows):
 		val_i = map_range*(i + 0.5 - rows*0.5) / rows
@@ -129,28 +132,33 @@ if (len(argv) > 1):
 						
 
 if (f_name == ""):
-	f_name = input('enter generator file name: ')
+	f_name = input('Enter generator file name: ')
 if (n_classes == 0):
-	n_classes=int(input('number of classes: '))
+	n_classes=int(input('Enter number of classes: '))
 
 model = load_model(f_name)
 
 while(in_text == None):
 	try:
-		in_char = input('enter char id: ')
+		in_char = input('Enter char ID: ')
 		char = int(in_char)
 	except ValueError:
 		char = to_label(in_char)
+		print("Using char ID:", char, "(", label_arr[char], ")")
 	except Exception as e:
 		print(e)
 		quit()
 
 	# generate images
-	latent_points, _ = generate_latent_points(100, rows*n_classes)
+	latent_points = generate_latent_points(100, rows*n_classes)
 	if (lat_map_range != 0):
 		if (char == -1):
+			latent_points = latent_points.reshape((rows, n_classes, 100))
 			for c in range(n_classes):
-				latent_points[c*rows:c*rows+rows] = generate_latent_points_not_random(100, rows, 1, lat_map_range)
+				pts = generate_latent_points_not_random(100, rows, 1, lat_map_range)
+				for r in range(rows):
+					latent_points[r, c] = pts[r]
+			latent_points = latent_points.reshape((n_classes*rows, 100))
 		else:
 			latent_points = generate_latent_points_not_random(100, rows, n_classes, lat_map_range)
 	# specify labels
@@ -184,7 +192,7 @@ text = ['this', 'is', 'placeholder', 'text']
 # text string is not None
 while (n_classes == 47):
 	if (in_text == []):
-		new_text = input("Write text here: ").split()
+		new_text = input("Enter text here: ").split()
 		if (new_text != []):
 			text = new_text
 	else:
@@ -203,7 +211,7 @@ while (n_classes == 47):
 			except:
 				labels[i,j] = 0
 	height, width = labels.shape[0], labels.shape[1]
-	lat_pts, _ = generate_latent_points(100, height*width)
+	lat_pts = generate_latent_points_similar(100, height*width)
 	out = model.predict([lat_pts, labels.reshape(height*width)])
 	out = (out +1) / 2.0
 	for h in range(height):
