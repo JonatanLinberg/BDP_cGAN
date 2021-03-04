@@ -61,7 +61,7 @@ if (len(df_list) > 1):
 			a.set_xticks(arange(0, x_len+1, x_len//x_steps, dtype=int))
 			a.set_ylim(bottom=0)
 else:
-	choice = int(input('1. all plots\n2. loss only\n3. accuracy only\n4. FID only\nChoose: '))
+	choice = int(input('1. all plots\n2. loss only\n3. accuracy only\n4. FID only\n5. Loss ratio\nChoose: '))
 	if (choice == 1):
 		plot, sub = plt.subplots(3, figsize=(col_w, col_h))
 		sub[0].plot(df[['d_loss_real','d_loss_fake','g_loss']])
@@ -85,6 +85,10 @@ else:
 		elif (choice == 4):
 			df['FID'].plot()
 			plt.ylabel('FID')
+		elif (choice == 5):
+			((df['d_loss_fake'] + df['d_loss_real']) / (2*df['g_loss'])).plot()
+			plt.ylim(top=1.5)
+			plt.ylabel('Loss ratio')
 		plt.xlabel('number of batches')
 		plt.ylim(bottom=0)
 
