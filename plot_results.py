@@ -8,7 +8,7 @@ average_p_col = False
 df_list = []
 x_len = 0
 x_steps = 5
-col_w = 6
+col_w = 8
 col_h = 8
 
 for i in range(1, len(argv)):
@@ -43,16 +43,21 @@ for df in df_list:
 		x_len = df.shape[0]
 
 if (len(df_list) > 1):
-	plot, ax = plt.subplots(len(df_list), 3, figsize=(col_w*len(df_list), col_h))
+	plot, ax = plt.subplots(len(df_list), 4, figsize=(col_w*len(df_list), col_h))
 	for i in range(len(df_list)):
 		ax[i, 0].plot(df_list[i][['d_loss_real','d_loss_fake','g_loss']])
 		ax[i, 0].legend(('d_loss_real','d_loss_fake','g_loss'))
+		ax[i, 0].set_ylim(top=3)
 		ax[i, 0].set_ylabel('loss')
 		ax[i, 1].plot(df_list[i][['d_acc_real', 'd_acc_fake']])
 		ax[i, 1].legend(('d_acc_real', 'd_acc_fake'))
+		ax[i, 1].set_ylim(top=1)
 		ax[i, 1].set_ylabel('accuracy')
 		ax[i, 2].plot(df_list[i]['FID'])
 		ax[i, 2].set_ylabel('FID')
+		ax[i, 3].plot(((df_list[i]['d_loss_fake'] + df_list[i]['d_loss_real']) / (2*df_list[i]['g_loss'])))
+		ax[i, 3].set_ylim(top=1.5)
+		ax[i, 3].set_ylabel('Loss ratio')
 	for i in range(len(ax)):
 		ax[i, 0].set_title(filenames[i], loc='left')
 		for a in ax[i]:
