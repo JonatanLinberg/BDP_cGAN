@@ -62,6 +62,7 @@ class GuiGen(tk.Frame):
 		self.char_class = 10
 		self.should_update_figure = False
 		self.slider_frames = []
+		self.sliders = []
 		self.createGUI()
 
 	def createGUI(self):
@@ -78,19 +79,30 @@ class GuiGen(tk.Frame):
 			c_g = int(127 + 64 * ((c_delta+1)%3)) % 256
 			c_b = int(127 + 64 * ((c_delta+2)%3)) % 256
 			c_str = '{0:06x}'.format(c_r*(16**4) + c_g*(16**2) + c_b)
-			slider = tk.Scale(self.slider_frames[i//n_rows], bg='#'+c_str, from_=-3 * lat_scale, to=3 * lat_scale, length=col_w, orient=tk.HORIZONTAL, command=partial(self.update_latent_var, i))
-			slider.set(dim * lat_scale)
-			slider.pack()
+			self.sliders.append(tk.Scale(self.slider_frames[i//n_rows], bg='#'+c_str, from_=-3 * lat_scale, to=3 * lat_scale, length=col_w, orient=tk.HORIZONTAL, command=partial(self.update_latent_var, i)))
+			self.set_slider_val(i, dim * lat_scale)
+			self.sliders[i].pack()
 
 		self.char_frame = tk.Frame(self.frame, width=col_w, height=col_h)
 		self.char_frame.pack_propagate(0)
 		self.char_frame.pack(side='left')
-		self.class_slider = tk.Scale(self.char_frame, from_=0, to=n_classes-1, length=col_w, label="Class ID",orient=tk.HORIZONTAL, command=self.update_char_class)
-		self.class_slider.set(self.char_class)
-		self.class_slider.place(relx=0.5, rely=0.3, anchor='c')
+		class_slider = tk.Scale(self.char_frame, from_=0, to=n_classes-1, length=col_w, label="Class ID",orient=tk.HORIZONTAL, command=self.update_char_class)
+		class_slider.set(self.char_class)
+		class_slider.place(relx=0.5, rely=0.3, anchor='c')
+		randomiseBtn = tk.Button(self.char_frame, text='Randomise', command=self.randomise_latent_point)
+		randomiseBtn.place(relx=0.5, rely=0.2, anchor='c')
 		self.figureFrame = tk.Frame(self.char_frame)
 		self.set_should_update_figure(True)
 		self.parent.after(0, self.updateFigure)
+
+	def randomise_latent_point(self):
+		self.lat_pt = generate_latent_point(n_latent_dim)
+		for i, dim in enumerate(self.lat_pt[0]):
+			self.set_slider_val(i, dim*lat_scale)
+
+	def set_slider_val(self, i, new_val):
+		self.sliders[i].set(new_val)
+		self.update_latent_var(i, new_val) #calls gui update
 
 	def update_latent_var(self, sliderID, new_val):
 		self.lat_pt[0, sliderID] = int(new_val)/lat_scale
