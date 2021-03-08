@@ -261,6 +261,8 @@ def save_plot(examples, epoch, rows, cols, red_arr):
 		pyplot.imshow(examples[i, :, :, 0], cmap=cmap)
 	pyplot.subplots_adjust(wspace=0, hspace=0, left=0, right=1, bottom=0, top=1)
 	fig.savefig(rtp_folder_name + 'out_%d.png' % epoch)
+	pyplot.close(fig)
+	pyplot.close('all') # to be save
 
 
 # calculate frechet inception distance
