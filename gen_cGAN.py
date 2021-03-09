@@ -92,6 +92,7 @@ n_classes = 0
 rows = 10
 in_text = None
 lat_map_range = 0
+in_char_id = None
 
 # load model
 if (len(argv) > 1):
@@ -128,6 +129,11 @@ if (len(argv) > 1):
 						lat_map_range = int(argv[i+1])
 					except:
 						print('Invalid latent map range!\nusage:\n\t"python gen_cGAN.py -L <lat_map_range>"')
+				elif (opt == 'C'):
+					try:
+						in_char_id = int(argv[i+1])
+					except:
+						print('Invalid char ID!\nusage:\n\t"python gen_cGAN.py -C <char ID>"')
 
 						
 
@@ -138,17 +144,23 @@ if (n_classes == 0):
 
 model = load_model(f_name)
 
+stop = False
 while(in_text == None):
-	try:
-		in_char = input('Enter char ID: ')
-		char = int(in_char)
-	except ValueError:
-		char = to_label(in_char)
-		print("Using char ID:", char, "(", label_arr[char], ")")
-	except Exception as e:
-		print(e)
+	if (in_char_id == None):
+		try:
+			in_char = input('Enter char ID: ')
+			char = int(in_char)
+		except ValueError:
+			char = to_label(in_char)
+			print("Using char ID:", char, "(", label_arr[char], ")")
+		except Exception as e:
+			print(e)
+			quit()
+	elif (not stop):
+		char = in_char_id
+		stop = True
+	else:	# only do once when -C
 		quit()
-
 	# generate images
 	latent_points = generate_latent_points(100, rows*n_classes)
 	if (lat_map_range != 0):
