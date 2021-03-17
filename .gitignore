@@ -4,3 +4,4 @@
 /venv
 *.h5
 !final*.h5
+.DS_Store
