@@ -47,6 +47,40 @@ def to_label(in_lbl):
 			return i
 	return 0
 
+def placeTextInArray(textList, textWidth = -1):
+	n_cols = 0
+	for word in textList:
+		if (len(word) > n_cols):
+			n_cols = len(word)
+	if (n_cols < textWidth):
+		n_cols = textWidth
+
+	i = 0
+	change = False
+	while (i != -1 and len(textList) > 1):
+		if (len(textList[i]) + len(textList[i+1]) < n_cols):
+			textList[i] = textList[i] + " " + textList[i+1]
+			textList.pop(i+1)
+			change = True
+		i = (i+1)
+		if (i >= len(textList)-1 and change):
+			i = 0
+			change = False
+		elif (i >= len(textList)-1 and not change):
+			i = -1
+	space_map = zeros((len(textList), n_cols), dtype=bool)
+	for i, _ in enumerate(space_map):
+		for j, _ in enumerate(space_map[i]):
+			try:
+				if (textList[i][j] == ' '):
+					space_map[i, j] = True
+			except IndexError:
+				space_map[i, j] = True
+			except Exception as e:
+				print(e)
+				quit()
+	return textList, space_map
+
 # generate points in latent space as input for the generator
 def generate_latent_points(latent_dim, n_samples):
 	# generate points in the latent space
@@ -93,6 +127,7 @@ rows = 10
 in_text = None
 lat_map_range = 0
 in_char_id = None
+text_width = -1
 
 # load model
 if (len(argv) > 1):
@@ -124,6 +159,11 @@ if (len(argv) > 1):
 						in_text = argv[i+1].split()
 					except:
 						in_text = []
+				elif (opt == 'w'):
+					try:
+						text_width = int(argv[i+1])
+					except:
+						print('Invalid text width!\nusage:\n\t"python gen_cGAN.py -w <text width>"')
 				elif (opt == 'L'):
 					try:
 						lat_map_range = int(argv[i+1])
@@ -200,7 +240,7 @@ while(in_text == None):
 	else:
 		save_plot(out, rows, n_classes)
 
-text = ['this', 'is', 'placeholder', 'text']
+text = ['this', 'is', 'placeholder', 'text', 'this  text  is  unneccessarily  spaced           ']
 # text string is not None
 while (n_classes == 47):
 	if (in_text == []):
@@ -209,13 +249,12 @@ while (n_classes == 47):
 			text = new_text
 	else:
 		text = in_text
-	n_cols = 0
-	for word in text:
-		if (len(word) > n_cols):
-			n_cols = len(word)
 
+	print("Using text: ", text)
+	text, space_arr = placeTextInArray(text, text_width)
+	
 	# text to int array
-	labels = zeros((len(text), n_cols), dtype=int)
+	labels = zeros((space_arr.shape), dtype=int)
 	for i, _ in enumerate(labels):
 		for j, _ in enumerate(labels[i]):
 			try:
@@ -228,7 +267,7 @@ while (n_classes == 47):
 	out = (out +1) / 2.0
 	for h in range(height):
 		for w in range(width):
-			if (len(text[h]) <= w):
+			if (space_arr[h, w]):
 				out[h*width+w] = zeros((28, 28, 1), dtype=float32)
 	save_plot(out, height, width)
 
