@@ -79,7 +79,7 @@ class GuiGen(tk.Frame):
 			c_g = int(127 + 64 * ((c_delta+1)%3)) % 256
 			c_b = int(127 + 64 * ((c_delta+2)%3)) % 256
 			c_str = '{0:06x}'.format(c_r*(16**4) + c_g*(16**2) + c_b)
-			self.sliders.append(tk.Scale(self.slider_frames[i//n_rows], bg='#'+c_str, from_=-3 * lat_scale, to=3 * lat_scale, length=col_w, orient=tk.HORIZONTAL, command=partial(self.update_latent_var, i)))
+			self.sliders.append(tk.Scale(self.slider_frames[i//n_rows], bg='#'+c_str, from_=-3 * lat_scale, to=3 * lat_scale, length=col_w, repeatdelay=200, repeatinterval=1, orient=tk.HORIZONTAL, command=partial(self.update_latent_var, i)))
 			self.set_slider_val(i, dim * lat_scale)
 			self.sliders[i].pack()
 
