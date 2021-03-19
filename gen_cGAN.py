@@ -131,7 +131,7 @@ eucl = False
 f_name = ""
 n_classes = 0
 rows = 10
-in_text = None
+in_text = False
 lat_map_range = 0
 in_char_id = None
 text_width = -1
@@ -164,10 +164,7 @@ if (len(argv) > 1):
 						print('Invalid file name!\nusage:\n\t"python gen_cGAN.py -f <f_name>"')
 						f_name = ""
 				elif (opt == 't'):
-					try:
-						in_text = argv[i+1].split()
-					except:
-						in_text = []
+					in_text = True
 				elif (opt == 'w'):
 					try:
 						text_width = int(argv[i+1])
@@ -204,7 +201,7 @@ if (n_classes == 0):
 model = load_model(f_name)
 
 stop = False
-while(in_text == None):
+while(not in_text):
 	if (in_char_id == None):
 		try:
 			in_char = input('Enter char ID: ')
@@ -262,12 +259,9 @@ while(in_text == None):
 text = ['this', 'is', 'placeholder', 'text', 'this  text  is  unneccessarily  spaced           ']
 # text string is not None
 while (n_classes == 47):
-	if (in_text == []):
-		new_text = input("Enter text here: ").split()
-		if (new_text != []):
-			text = new_text
-	else:
-		text = in_text
+	new_text = input("Enter text here: ").split()
+	if (new_text != []):
+		text = new_text
 
 	print("Using text: ", text)
 	text, space_arr = placeTextInArray(text, text_width)
