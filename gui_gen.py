@@ -91,12 +91,19 @@ class GuiGen(tk.Frame):
 		class_slider.place(relx=0.5, rely=0.3, anchor='c')
 		randomiseBtn = tk.Button(self.char_frame, text='Randomise', command=self.randomise_latent_point)
 		randomiseBtn.place(relx=0.5, rely=0.2, anchor='c')
+		normaliseBtn = tk.Button(self.char_frame, text='Normalise', command=self.normalise_latent_point)
+		normaliseBtn.place(relx=0.5, rely=0.15, anchor='c')
 		self.figureFrame = tk.Frame(self.char_frame)
 		self.set_should_update_figure(True)
 		self.parent.after(0, self.updateFigure)
 
 	def randomise_latent_point(self):
 		self.lat_pt = generate_latent_point(n_latent_dim)
+		for i, dim in enumerate(self.lat_pt[0]):
+			self.set_slider_val(i, dim*lat_scale)
+
+	def normalise_latent_point(self):
+		self.lat_pt[0].fill(0)
 		for i, dim in enumerate(self.lat_pt[0]):
 			self.set_slider_val(i, dim*lat_scale)
 
