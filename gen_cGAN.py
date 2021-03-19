@@ -93,7 +93,7 @@ def generate_latent_points_similar(latent_dim, n_samples):
 	pt = generate_latent_points(latent_dim, 1)
 	return (generate_latent_points(latent_dim, n_samples) / 2.5) + full((n_samples, latent_dim), pt[0])
 
-def generate_latent_points_not_random(latent_dim, rows, cols, map_range):
+def generate_latent_points_not_random(latent_dim, rows, cols, map_range, map_dim = [-1, -1]):
 	lps = generate_latent_points(latent_dim, rows*cols)
 	lps = lps.reshape(rows, cols, latent_dim)
 	for i in range(rows):
@@ -101,7 +101,14 @@ def generate_latent_points_not_random(latent_dim, rows, cols, map_range):
 		for j in range(cols):
 			val_j = map_range*(j + 0.5 - cols*0.5) / cols
 			for k in range(latent_dim):
-				lps[i, j, k] = ((k%2 or j<=1) * val_i + ((k+1)%2 or i<=1) * val_j) + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
+				if (map_dim[0] == -1 and map_dim[1] == -1):
+					lps[i, j, k] = ((k%2 or rows<=1) * val_i + ((k+1)%2 or cols<=1) * val_j)# + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
+				elif (k == map_dim[0]): # dim 0 means val_i for dim k==dim[0]
+					lps[i, j, k] = (val_i)# + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
+				elif (k == map_dim[1]): # dim 1 means val_j for dim k==dim[1]
+					lps[i, j, k] = (val_j)# + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
+				else:
+					lps[i, j, k] = 0#(lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
 	return lps.reshape(cols*rows, latent_dim)
 
 
@@ -128,12 +135,14 @@ in_text = None
 lat_map_range = 0
 in_char_id = None
 text_width = -1
+in_dim = [-1, -1]
+latent_dim = 100
 
 # load model
 if (len(argv) > 1):
 	for i, arg in enumerate(argv):
 		if (arg[0] == '-'):
-			for opt in arg:
+			for j, opt in enumerate(arg):
 				if (opt == 'r'):
 					try:
 						rows = int(argv[i+1])
@@ -164,11 +173,21 @@ if (len(argv) > 1):
 						text_width = int(argv[i+1])
 					except:
 						print('Invalid text width!\nusage:\n\t"python gen_cGAN.py -w <text width>"')
+				elif (opt == 'l'):
+					try:
+						latent_dim = int(argv[i+1])
+					except:
+						print('Invalid number of dimensions!\nusage:\n\t"python gen_cGAN.py -l <number of dims>"')
 				elif (opt == 'L'):
 					try:
 						lat_map_range = int(argv[i+1])
 					except:
 						print('Invalid latent map range!\nusage:\n\t"python gen_cGAN.py -L <lat_map_range>"')
+				elif (opt == 'd'):
+					try:
+						in_dim[int(arg[j+1])-1] = int(argv[i+1])
+					except:
+						print('Invalid latent dim specification!\nusage:\n\t"python gen_cGAN.py -dx <dimension for dim #x>"')
 				elif (opt == 'C'):
 					try:
 						in_char_id = int(argv[i+1])
@@ -202,17 +221,17 @@ while(in_text == None):
 	else:	# only do once when -C
 		quit()
 	# generate images
-	latent_points = generate_latent_points(100, rows*n_classes)
+	latent_points = generate_latent_points(latent_dim, rows*n_classes)
 	if (lat_map_range != 0):
 		if (char == -1):
-			latent_points = latent_points.reshape((rows, n_classes, 100))
+			latent_points = latent_points.reshape((rows, n_classes, latent_dim))
 			for c in range(n_classes):
-				pts = generate_latent_points_not_random(100, rows, 1, lat_map_range)
+				pts = generate_latent_points_not_random(latent_dim, rows, 1, lat_map_range, map_dim=in_dim)
 				for r in range(rows):
 					latent_points[r, c] = pts[r]
-			latent_points = latent_points.reshape((n_classes*rows, 100))
+			latent_points = latent_points.reshape((n_classes*rows, latent_dim))
 		else:
-			latent_points = generate_latent_points_not_random(100, rows, n_classes, lat_map_range)
+			latent_points = generate_latent_points_not_random(latent_dim, rows, n_classes, lat_map_range, map_dim=in_dim)
 	# specify labels
 	labels = zeros(n_classes*rows)
 	# generate images
@@ -262,7 +281,7 @@ while (n_classes == 47):
 			except:
 				labels[i,j] = 0
 	height, width = labels.shape[0], labels.shape[1]
-	lat_pts = generate_latent_points_similar(100, height*width)
+	lat_pts = generate_latent_points_similar(latent_dim, height*width)
 	out = model.predict([lat_pts, labels.reshape(height*width)])
 	out = (out +1) / 2.0
 	for h in range(height):
