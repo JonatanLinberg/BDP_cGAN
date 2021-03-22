@@ -10,9 +10,11 @@ from numpy import zeros
 from functools import partial
 from sys import argv
 import os
+from math import ceil
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
 os.environ["CUDA_VISIBLE_DEVICES"] = '-1'
 from tensorflow.keras.models import load_model
+import tensorflow as tf
 
 # generate points in latent space as input for the generator
 def generate_latent_point(latent_dim):
@@ -45,13 +47,12 @@ except:
 	quit()
 
 fig_update_interval = 300
-n_latent_dim = 100
+n_latent_dim = model.layers[1].input_shape[0][1] # I think this *always* works
 n_slider_frames = 4
 n_classes = 47
 col_w = 300
 col_h = 1050
 lat_scale = 1000
-
 
 class GuiGen(tk.Frame):
 	def __init__(self, parent):
@@ -72,7 +73,7 @@ class GuiGen(tk.Frame):
 			self.slider_frames[i].pack_propagate(0)
 			self.slider_frames[i].pack(side='left')
 
-		n_rows = (n_latent_dim//n_slider_frames)
+		n_rows = ceil(n_latent_dim/n_slider_frames)
 		for i, dim in enumerate(self.lat_pt[0]):
 			c_delta = i % n_rows
 			c_r = int(127 + 64 * ((c_delta%3))) % 256
