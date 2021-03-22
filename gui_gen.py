@@ -87,7 +87,7 @@ class GuiGen(tk.Frame):
 		self.char_frame = tk.Frame(self.frame, width=col_w, height=col_h)
 		self.char_frame.pack_propagate(0)
 		self.char_frame.pack(side='left')
-		class_slider = tk.Scale(self.char_frame, from_=0, to=n_classes-1, length=col_w, label="Class ID",orient=tk.HORIZONTAL, command=self.update_char_class)
+		class_slider = tk.Scale(self.char_frame, repeatdelay=1000, repeatinterval=1000, from_=0, to=n_classes-1, length=col_w, label="Class ID",orient=tk.HORIZONTAL, command=self.update_char_class)
 		class_slider.set(self.char_class)
 		class_slider.place(relx=0.5, rely=0.3, anchor='c')
 		randomiseBtn = tk.Button(self.char_frame, text='Randomise', command=self.randomise_latent_point)

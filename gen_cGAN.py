@@ -199,6 +199,8 @@ if (n_classes == 0):
 	n_classes=int(input('Enter number of classes: '))
 
 model = load_model(f_name)
+# This *should* work, if not -> comment line and use '-D'-option
+latent_dim = model.layers[1].input_shape[0][1]
 
 stop = False
 while(not in_text):
