@@ -170,7 +170,7 @@ if (len(argv) > 1):
 						text_width = int(argv[i+1])
 					except:
 						print('Invalid text width!\nusage:\n\t"python gen_cGAN.py -w <text width>"')
-				elif (opt == 'l'):
+				elif (opt == 'D'):
 					try:
 						latent_dim = int(argv[i+1])
 					except:
