@@ -302,11 +302,15 @@ def define_discriminator(in_shape=(28,28,1), n_classes=rtp_n_classes):
 	merge = Concatenate()([in_image, li])
 	#print(merge.shape)
 	# downsample
-	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(2,2), padding='same')(merge)
+	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(1,1), padding='same')(merge)
+	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
+	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(2,2), padding='same')(fe)
 	#print(fe.shape)
 	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
 	#print(fe.shape)
 	# downsample
+	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(1,1), padding='same')(fe)
+	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
 	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(2,2), padding='same')(fe)
 	#print(fe.shape)
 	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
