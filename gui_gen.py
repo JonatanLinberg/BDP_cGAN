@@ -7,6 +7,7 @@ from matplotlib.pyplot import subplots
 from matplotlib.pyplot import close as plt_close
 from numpy.random import randn
 from numpy import zeros
+from numpy import array
 from functools import partial
 from sys import argv
 import os
@@ -21,7 +22,7 @@ def generate_latent_point(latent_dim):
 	# generate points in the latent space
 	x_input = randn(latent_dim)
 	# reshape into a batch of inputs for the network
-	z_input = x_input.reshape(1, latent_dim)
+	z_input = x_input.reshape(1, latent_dim).astype('float32')
 	return z_input
 
 
@@ -32,7 +33,7 @@ def generate_figure(model, latent_point, class_label):
 	out = model.predict([latent_point, label])
 	out = (out + 1) / 2.0
 	fig, ax = subplots(figsize=(2.8, 2.8))
-	axis('off')
+	ax.tick_params(which='both', bottom=False, top=False, left=False, right=False, labelbottom=False, labeltop=False, labelleft=False, labelright=False)
 	ax = imshow(out[0, :, :, 0], cmap='gray_r')
 	return fig 
 
@@ -51,8 +52,9 @@ n_latent_dim = model.layers[1].input_shape[0][1] # I think this *always* works
 n_slider_frames = 4
 n_classes = 47
 col_w = 300
-col_h = 1050
+col_h = 1000
 lat_scale = 1000
+NoneType = type(None)
 
 class GuiGen(tk.Frame):
 	def __init__(self, parent):
@@ -64,6 +66,8 @@ class GuiGen(tk.Frame):
 		self.should_update_figure = False
 		self.slider_frames = []
 		self.sliders = []
+		self.saved_vector = zeros((1, n_latent_dim), dtype='float32')
+		self.base_vector = zeros((1, n_latent_dim), dtype='float32')
 		self.createGUI()
 
 	def createGUI(self):
@@ -89,28 +93,44 @@ class GuiGen(tk.Frame):
 		self.char_frame.pack(side='left')
 		class_slider = tk.Scale(self.char_frame, repeatdelay=1000, repeatinterval=1000, from_=0, to=n_classes-1, length=col_w, label="Class ID",orient=tk.HORIZONTAL, command=self.update_char_class)
 		class_slider.set(self.char_class)
-		class_slider.place(relx=0.5, rely=0.3, anchor='c')
+		class_slider.place(relx=0.5, rely=0.4, anchor='c')
 		randomiseBtn = tk.Button(self.char_frame, text='Randomise', command=self.randomise_latent_point)
-		randomiseBtn.place(relx=0.5, rely=0.2, anchor='c')
+		randomiseBtn.place(relx=0.5, rely=0.25, anchor='c')
 		normaliseBtn = tk.Button(self.char_frame, text='Normalise', command=self.normalise_latent_point)
-		normaliseBtn.place(relx=0.5, rely=0.15, anchor='c')
+		normaliseBtn.place(relx=0.5, rely=0.2, anchor='c')
+		saveBtn = tk.Button(self.char_frame, text='Save vector', command=self.save_vector)
+		saveBtn.place(relx=0.5, rely=0.10, anchor='c')
+		self.vectorSlider = tk.Scale(self.char_frame, from_=-500, to=500, orient=tk.HORIZONTAL, command=self.set_vector_percent)
+		self.vectorSlider.place(relx=0.5, rely=0.15, anchor='c')
 		self.figureFrame = tk.Frame(self.char_frame)
 		self.set_should_update_figure(True)
 		self.parent.after(0, self.updateFigure)
 
+	def save_vector(self):
+		self.saved_vector = array(self.lat_pt)
+		self.vectorSlider.set(100)
+		self.update_by_vector(100)
+
+	def set_vector_percent(self, val):
+		self.update_by_vector(int(val))
+
+	def update_by_vector(self, new_percent):
+		new_lat_pt = self.base_vector + self.saved_vector * (new_percent / 100)
+		for i, dim in enumerate(new_lat_pt[0]):
+			self.set_slider_val(i, dim*lat_scale)
+
 	def randomise_latent_point(self):
-		self.lat_pt = generate_latent_point(n_latent_dim)
-		for i, dim in enumerate(self.lat_pt[0]):
+		new_lat_pt = generate_latent_point(n_latent_dim)
+		for i, dim in enumerate(new_lat_pt[0]):
 			self.set_slider_val(i, dim*lat_scale)
 
 	def normalise_latent_point(self):
-		self.lat_pt[0].fill(0)
-		for i, dim in enumerate(self.lat_pt[0]):
-			self.set_slider_val(i, dim*lat_scale)
+		for i in range(n_latent_dim):
+			self.set_slider_val(i, 0)
 
 	def set_slider_val(self, i, new_val):
 		self.sliders[i].set(new_val)
-		self.update_latent_var(i, new_val) #calls gui update
+		self.update_latent_var(i, new_val) #called from slider set event
 
 	def update_latent_var(self, sliderID, new_val):
 		self.lat_pt[0, sliderID] = int(new_val)/lat_scale
@@ -125,7 +145,7 @@ class GuiGen(tk.Frame):
 			self.set_should_update_figure(False)
 			self.figureFrame.destroy()
 			self.figureFrame = tk.Frame(self.char_frame)
-			self.figureFrame.place(relx=0.5, rely=0.5, anchor='c')
+			self.figureFrame.place(relx=0.5, rely=0.75, anchor='c')
 			tk_fig = FigureCanvasTkAgg(generate_figure(model, self.lat_pt, self.char_class), self.figureFrame)
 			tk_fig.get_tk_widget().pack()
 		self.parent.after(fig_update_interval, self.updateFigure)
