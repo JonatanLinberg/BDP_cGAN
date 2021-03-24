@@ -47,7 +47,7 @@ except:
 	print("Cannot read model file")
 	quit()
 
-fig_update_interval = 300
+fig_update_interval = 350
 n_latent_dim = model.layers[1].input_shape[0][1] # I think this *always* works
 n_slider_frames = 4
 n_classes = 47
@@ -61,7 +61,7 @@ class GuiGen(tk.Frame):
 		self.parent = parent
 		self.frame = tk.Frame(parent)
 		self.frame.pack(side="top", fill="both", expand=True)
-		self.lat_pt = generate_latent_point(n_latent_dim)
+		self.lat_pt = zeros((1, n_latent_dim), dtype='float32')
 		self.char_class = 10
 		self.should_update_figure = False
 		self.slider_frames = []
@@ -94,17 +94,27 @@ class GuiGen(tk.Frame):
 		class_slider = tk.Scale(self.char_frame, repeatdelay=1000, repeatinterval=1000, from_=0, to=n_classes-1, length=col_w, label="Class ID",orient=tk.HORIZONTAL, command=self.update_char_class)
 		class_slider.set(self.char_class)
 		class_slider.place(relx=0.5, rely=0.4, anchor='c')
+		self.randomBound = tk.Scale(self.char_frame, from_=0, to=3*lat_scale, label='Random Bound', length=col_w, orient=tk.HORIZONTAL)
+		self.randomBound.set(3*lat_scale)
+		self.randomBound.place(relx=0.5, rely=0.30, anchor='c')
 		randomiseBtn = tk.Button(self.char_frame, text='Randomise', command=self.randomise_latent_point)
 		randomiseBtn.place(relx=0.5, rely=0.25, anchor='c')
 		normaliseBtn = tk.Button(self.char_frame, text='Normalise', command=self.normalise_latent_point)
 		normaliseBtn.place(relx=0.5, rely=0.2, anchor='c')
-		saveBtn = tk.Button(self.char_frame, text='Save vector', command=self.save_vector)
+		saveBtn = tk.Button(self.char_frame, text='Save Vector', command=self.save_vector)
 		saveBtn.place(relx=0.5, rely=0.10, anchor='c')
-		self.vectorSlider = tk.Scale(self.char_frame, from_=-500, to=500, orient=tk.HORIZONTAL, command=self.set_vector_percent)
+		saveBtn = tk.Button(self.char_frame, text='Save Base Vector', command=self.save_base_vector)
+		saveBtn.place(relx=0.5, rely=0.05, anchor='c')
+		self.vectorSlider = tk.Scale(self.char_frame, from_=-500, to=500, label='Traverse Vector', length=col_w, orient=tk.HORIZONTAL, command=self.set_vector_percent)
 		self.vectorSlider.place(relx=0.5, rely=0.15, anchor='c')
 		self.figureFrame = tk.Frame(self.char_frame)
 		self.set_should_update_figure(True)
 		self.parent.after(0, self.updateFigure)
+
+	def save_base_vector(self):
+		self.base_vector = array(self.lat_pt)
+		self.vectorSlider.set(0)
+		self.update_by_vector(0)
 
 	def save_vector(self):
 		self.saved_vector = array(self.lat_pt)
@@ -120,7 +130,7 @@ class GuiGen(tk.Frame):
 			self.set_slider_val(i, dim*lat_scale)
 
 	def randomise_latent_point(self):
-		new_lat_pt = generate_latent_point(n_latent_dim)
+		new_lat_pt = generate_latent_point(n_latent_dim) * (int(self.randomBound.get())/(3*lat_scale))
 		for i, dim in enumerate(new_lat_pt[0]):
 			self.set_slider_val(i, dim*lat_scale)
 
