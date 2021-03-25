@@ -330,7 +330,7 @@ def define_discriminator(in_shape=(28,28,1), n_classes=rtp_n_classes):
 	if (rtp_conf_list[rtp_list_index]['SGD'] == 'y'):
 		opt = SGD(learning_rate=rtp_conf_list[rtp_list_index]['learn_rate'], momentum=rtp_conf_list[rtp_list_index]['SGD_momentum'], nesterov=(rtp_conf_list[rtp_list_index]['SGD_nesterov']=='y'))
 	else:
-		opt = Adam(lr=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
+		opt = Adam(learning_rate=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
 	model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 	return model
 
@@ -392,7 +392,7 @@ def define_gan(g_model, d_model):
 	if (rtp_conf_list[rtp_list_index]['SGD'] == 'y'):
 		opt = SGD(learning_rate=rtp_conf_list[rtp_list_index]['learn_rate'], momentum=rtp_conf_list[rtp_list_index]['SGD_momentum'], nesterov=(rtp_conf_list[rtp_list_index]['SGD_nesterov']=='y'))
 	else:
-		opt = Adam(lr=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
+		opt = Adam(learning_rate=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
 	model.compile(loss='binary_crossentropy', optimizer=opt)
 	return model
 
