@@ -110,7 +110,7 @@ if (len(rtp_conf_list) == 0):
 		rtp_conf['d_hidden_layers1'] = literal_eval(input('<D> hidden layers1 (0): ').strip())
 		rtp_conf['d_hidden_units1'] = literal_eval(input('<D> hidden units1 (0): ').strip())
 		rtp_conf['d_LeReLU_alpha'] = literal_eval(input('<D> leaky ReLU alpha (0.2): ').strip())
-		rtp_conf['d_conv_filters'] = literal_eval(input('<D> convolution filters (128): ').strip())
+		rtp_conf['d_conv_filters'] = literal_eval(input('<D> convolution filters (64): ').strip())
 		# Generator parameters
 		print(" < < Generator > >")
 		rtp_conf['g_embedding'] = literal_eval(input('<G> embedding parameters (50): ').strip())
@@ -171,7 +171,7 @@ for i, conf in enumerate(rtp_conf_list):
 		rtp_f.write('<D> hidden layers1 (0):%d\n' % conf['d_hidden_layers1'])
 		rtp_f.write('<D> hidden units1 (0):%d\n' % conf['d_hidden_units1'])
 		rtp_f.write('<D> leaky ReLU alpha (0.2):%f\n' % conf['d_LeReLU_alpha'])
-		rtp_f.write('<D> convolution filters (128):%d\n' % conf['d_conv_filters'])
+		rtp_f.write('<D> convolution filters (64):%d\n' % conf['d_conv_filters'])
 		rtp_f.write('<G> embedding parameters (50):%d\n' % conf['g_embedding'])
 		rtp_f.write('<G> hidden layers1 (1):%d\n' % conf['g_hidden_layers1'])
 		rtp_f.write('<G> hidden layers2 (1):%d\n' % conf['g_hidden_layers2'])
