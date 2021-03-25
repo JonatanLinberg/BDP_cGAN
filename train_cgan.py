@@ -57,12 +57,14 @@ rtp_root_folder = rtp_folder_name
 # Note! Training or testing is set in the load_real_samples function
 mndata.select_emnist('balanced')	# 'balanced', 'byclass'...
 rtp_n_classes = 47		# Important, will crash if not set correctly
+# size of the latent space
+n_latent_dim = 100
 
 rtp_def_conf = {'d_embedding':50,
 				'd_hidden_layers1':0,
 				'd_hidden_units1':0,
 				'd_LeReLU_alpha':0.2,
-				'd_conv_filters':128,
+				'd_conv_filters':64,
 				'g_embedding':50,
 				'g_hidden_layers1':1,
 				'g_hidden_layers2':1,
@@ -531,8 +533,6 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 		f_name = '%d.h5' % (i + 1)
 		g_model.save(rtp_folder_name + f_name)
 
-# size of the latent space
-latent_dim = 100
 # prepare the inception v3 model
 fid_model = InceptionV3(include_top=False, pooling='avg', input_shape=(299,299,3))
 # load image data
@@ -546,7 +546,7 @@ for i,conf in enumerate(rtp_conf_list):
 	# create the discriminator
 	d_model = define_discriminator()
 	# create the generator
-	g_model = define_generator(latent_dim)
+	g_model = define_generator(n_latent_dim)
 	# create the gan
 	gan_model = define_gan(g_model, d_model)
 
@@ -568,4 +568,4 @@ for i,conf in enumerate(rtp_conf_list):
 		file.write('')
 
 	# train model
-	train(g_model, d_model, gan_model, dataset, latent_dim, fid_model)
+	train(g_model, d_model, gan_model, dataset, n_latent_dim, fid_model)
