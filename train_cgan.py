@@ -57,12 +57,14 @@ rtp_root_folder = rtp_folder_name
 # Note! Training or testing is set in the load_real_samples function
 mndata.select_emnist('balanced')	# 'balanced', 'byclass'...
 rtp_n_classes = 47		# Important, will crash if not set correctly
+# size of the latent space
+n_latent_dim = 100
 
 rtp_def_conf = {'d_embedding':50,
 				'd_hidden_layers1':0,
 				'd_hidden_units1':0,
 				'd_LeReLU_alpha':0.2,
-				'd_conv_filters':128,
+				'd_conv_filters':64,
 				'g_embedding':50,
 				'g_hidden_layers1':1,
 				'g_hidden_layers2':1,
@@ -108,7 +110,7 @@ if (len(rtp_conf_list) == 0):
 		rtp_conf['d_hidden_layers1'] = literal_eval(input('<D> hidden layers1 (0): ').strip())
 		rtp_conf['d_hidden_units1'] = literal_eval(input('<D> hidden units1 (0): ').strip())
 		rtp_conf['d_LeReLU_alpha'] = literal_eval(input('<D> leaky ReLU alpha (0.2): ').strip())
-		rtp_conf['d_conv_filters'] = literal_eval(input('<D> convolution filters (128): ').strip())
+		rtp_conf['d_conv_filters'] = literal_eval(input('<D> convolution filters (64): ').strip())
 		# Generator parameters
 		print(" < < Generator > >")
 		rtp_conf['g_embedding'] = literal_eval(input('<G> embedding parameters (50): ').strip())
@@ -169,7 +171,7 @@ for i, conf in enumerate(rtp_conf_list):
 		rtp_f.write('<D> hidden layers1 (0):%d\n' % conf['d_hidden_layers1'])
 		rtp_f.write('<D> hidden units1 (0):%d\n' % conf['d_hidden_units1'])
 		rtp_f.write('<D> leaky ReLU alpha (0.2):%f\n' % conf['d_LeReLU_alpha'])
-		rtp_f.write('<D> convolution filters (128):%d\n' % conf['d_conv_filters'])
+		rtp_f.write('<D> convolution filters (64):%d\n' % conf['d_conv_filters'])
 		rtp_f.write('<G> embedding parameters (50):%d\n' % conf['g_embedding'])
 		rtp_f.write('<G> hidden layers1 (1):%d\n' % conf['g_hidden_layers1'])
 		rtp_f.write('<G> hidden layers2 (1):%d\n' % conf['g_hidden_layers2'])
@@ -302,11 +304,15 @@ def define_discriminator(in_shape=(28,28,1), n_classes=rtp_n_classes):
 	merge = Concatenate()([in_image, li])
 	#print(merge.shape)
 	# downsample
-	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(2,2), padding='same')(merge)
+	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(1,1), padding='same')(merge)
+	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
+	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(2,2), padding='same')(fe)
 	#print(fe.shape)
 	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
 	#print(fe.shape)
 	# downsample
+	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(1,1), padding='same')(fe)
+	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
 	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(2,2), padding='same')(fe)
 	#print(fe.shape)
 	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
@@ -326,7 +332,7 @@ def define_discriminator(in_shape=(28,28,1), n_classes=rtp_n_classes):
 	if (rtp_conf_list[rtp_list_index]['SGD'] == 'y'):
 		opt = SGD(learning_rate=rtp_conf_list[rtp_list_index]['learn_rate'], momentum=rtp_conf_list[rtp_list_index]['SGD_momentum'], nesterov=(rtp_conf_list[rtp_list_index]['SGD_nesterov']=='y'))
 	else:
-		opt = Adam(lr=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
+		opt = Adam(learning_rate=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
 	model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 	return model
 
@@ -388,7 +394,7 @@ def define_gan(g_model, d_model):
 	if (rtp_conf_list[rtp_list_index]['SGD'] == 'y'):
 		opt = SGD(learning_rate=rtp_conf_list[rtp_list_index]['learn_rate'], momentum=rtp_conf_list[rtp_list_index]['SGD_momentum'], nesterov=(rtp_conf_list[rtp_list_index]['SGD_nesterov']=='y'))
 	else:
-		opt = Adam(lr=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
+		opt = Adam(learning_rate=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
 	model.compile(loss='binary_crossentropy', optimizer=opt)
 	return model
 
@@ -527,8 +533,6 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 		f_name = '%d.h5' % (i + 1)
 		g_model.save(rtp_folder_name + f_name)
 
-# size of the latent space
-latent_dim = 100
 # prepare the inception v3 model
 fid_model = InceptionV3(include_top=False, pooling='avg', input_shape=(299,299,3))
 # load image data
@@ -542,7 +546,7 @@ for i,conf in enumerate(rtp_conf_list):
 	# create the discriminator
 	d_model = define_discriminator()
 	# create the generator
-	g_model = define_generator(latent_dim)
+	g_model = define_generator(n_latent_dim)
 	# create the gan
 	gan_model = define_gan(g_model, d_model)
 
@@ -564,4 +568,4 @@ for i,conf in enumerate(rtp_conf_list):
 		file.write('')
 
 	# train model
-	train(g_model, d_model, gan_model, dataset, latent_dim, fid_model)
+	train(g_model, d_model, gan_model, dataset, n_latent_dim, fid_model)
