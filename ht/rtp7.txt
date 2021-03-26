@@ -1,0 +1,14 @@
+<D> embedding parameters (50):50
+<D> hidden layers1 (0):0
+<D> hidden units1 (0):0
+<D> leaky ReLU alpha (0.2):0.010000
+<D> convolution filters (128):128
+<G> embedding parameters (50):50
+<G> hidden layers1 (1):1
+<G> hidden layers2 (1):1
+<G> hidden units2 (128):128
+<G> deconvolution filters (128):128
+<G> leaky ReLU alpha (0.2):0.010000
+SGD (y/n):n
+Learning rate (0.0002):0.000100
+n_classes:47
