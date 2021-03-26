@@ -9,6 +9,6 @@
 <G> hidden units2 (128):128
 <G> deconvolution filters (128):128
 <G> leaky ReLU alpha (0.2):0.010000
-Learning rate (0.0002):0.000200
 SGD (y/n):n
+Learning rate (0.0002):0.000200
 n_classes:47
