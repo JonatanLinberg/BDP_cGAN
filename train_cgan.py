@@ -39,6 +39,7 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras.applications.inception_v3 import InceptionV3
 from tensorflow.keras.applications.inception_v3 import preprocess_input
 from tensorflow.keras.datasets.mnist import load_data
+from tensorflow.keras.datasets.fashion_mnist import load_data
 from scipy.linalg import sqrtm
 from skimage.transform import resize
 from mnist import MNIST
@@ -56,7 +57,7 @@ rtp_root_folder = rtp_folder_name
 # Dataset
 # Note! Training or testing is set in the load_real_samples function
 mndata.select_emnist('balanced')	# 'balanced', 'byclass'...
-rtp_n_classes = 47		# Important, will crash if not set correctly
+rtp_n_classes = 10		# Important, will crash if not set correctly
 # size of the latent space
 n_latent_dim = 100
 
@@ -405,13 +406,13 @@ def define_gan(g_model, d_model):
 # load fashion mnist images
 def load_real_samples():
 	# load dataset
-	#(trainX, trainY), (_, _) = load_data()
+	(trainX, trainY), (_, _) = load_data()
 	
 	# load emnist dataset
-	(trainX, trainY) = mndata.load_training()
-	trainX = asarray(trainX)
-	trainY = asarray(trainY)
-	trainX = reshape(trainX, [-1, 28, 28])
+	#(trainX, trainY) = mndata.load_training()
+	#trainX = asarray(trainX)
+	#trainY = asarray(trainY)
+	#trainX = reshape(trainX, [-1, 28, 28])
 
 	# expand to 3d, e.g. add channels
 	X = expand_dims(trainX, axis=-1)
