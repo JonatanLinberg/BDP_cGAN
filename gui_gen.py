@@ -31,7 +31,7 @@ def generate_figure(model, latent_point, class_label):
 	plt_close()
 	label = zeros((1,), dtype=int)
 	label[0] = class_label
-	out = model.predict([latent_point, label])
+	out = model([latent_point, label])
 	out = (out + 1) / 2.0
 	fig, ax = subplots(figsize=(2.8, 2.8))
 	ax.tick_params(which='both', bottom=False, top=False, left=False, right=False, labelbottom=False, labeltop=False, labelleft=False, labelright=False)
@@ -49,7 +49,7 @@ except:
 	quit()
 
 fig_update_interval = 350
-trav_anim_interval = 500
+trav_anim_interval = 350
 trav_vec_min = -500
 trav_vec_max = 500
 red = "#EE2211"
