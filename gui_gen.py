@@ -184,7 +184,7 @@ class GuiGen(tk.Frame):
 				self.vectorSlider.set(vec_val)
 			else:
 				class_val = self.class_slider.get() + 1
-				if (class_val <= self.n_classes.get()):
+				if (class_val <= self.n_classes.get()-1):
 					self.class_slider.set(class_val)
 				else:
 					self.class_slider.set(0)
