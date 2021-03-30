@@ -65,16 +65,17 @@ rtp_def_conf = {'d_embedding':50,
 				'd_hidden_units1':0,
 				'd_LeReLU_alpha':0.2,
 				'd_conv_filters':64,
+				'd_learn_rate':0.0002,
 				'g_embedding':50,
 				'g_hidden_layers1':1,
 				'g_hidden_layers2':1,
 				'g_hidden_units_mult2':128,
 				'g_deconv_filters':128,
 				'g_LeReLU_alpha':0.2,
+				'g_learn_rate':0.0002,
 				'SGD':'n',
 				'SGD_momentum':0.0,
-				'SGD_nesterov':'n',
-				'learn_rate':0.0002}
+				'SGD_nesterov':'n'}
 rtp_conf_list = []
 rtp_list_index = 0
 for argi in range(1, len(argv)): # linked rtp-file
@@ -87,6 +88,7 @@ for argi in range(1, len(argv)): # linked rtp-file
 		rtp_conf['d_hidden_units1'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf['d_LeReLU_alpha'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf['d_conv_filters'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['d_learn_rate'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		# Generator parameters
 		rtp_conf['g_embedding'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf['g_hidden_layers1'] = literal_eval(rtp_file.readline().split(':')[1].strip())
@@ -94,12 +96,12 @@ for argi in range(1, len(argv)): # linked rtp-file
 		rtp_conf['g_hidden_units_mult2'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf['g_deconv_filters'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf['g_LeReLU_alpha'] = literal_eval(rtp_file.readline().split(':')[1].strip())
+		rtp_conf['g_learn_rate'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		# other
 		rtp_conf['SGD'] = rtp_file.readline().split(':')[1].strip()
 		if (rtp_conf['SGD'] == 'y'):
 			rtp_conf['SGD_momentum'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 			rtp_conf['SGD_nesterov'] = rtp_file.readline().split(':')[1].strip()
-		rtp_conf['learn_rate'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf_list.append(rtp_conf)
 
 if (len(rtp_conf_list) == 0):
@@ -111,6 +113,7 @@ if (len(rtp_conf_list) == 0):
 		rtp_conf['d_hidden_units1'] = literal_eval(input('<D> hidden units1 (0): ').strip())
 		rtp_conf['d_LeReLU_alpha'] = literal_eval(input('<D> leaky ReLU alpha (0.2): ').strip())
 		rtp_conf['d_conv_filters'] = literal_eval(input('<D> convolution filters (64): ').strip())
+		rtp_conf['d_learn_rate'] = float(input('<D> Learning rate (0.0002): ').strip())
 		# Generator parameters
 		print(" < < Generator > >")
 		rtp_conf['g_embedding'] = literal_eval(input('<G> embedding parameters (50): ').strip())
@@ -119,13 +122,13 @@ if (len(rtp_conf_list) == 0):
 		rtp_conf['g_hidden_units_mult2'] = literal_eval(input('<G> hidden unit mult2 (128): ').strip())
 		rtp_conf['g_deconv_filters'] = literal_eval(input('<G> deconvolution filters (128): ').strip())
 		rtp_conf['g_LeReLU_alpha'] = literal_eval(input('<G> leaky ReLU alpha (0.2): ').strip())
+		rtp_conf['g_learn_rate'] = float(input('<G> Learning rate (0.0002): ').strip())
 
 		print(" < < Other > >")
 		rtp_conf['SGD'] = input('SGD (y/n): ').strip()
 		if (rtp_conf['SGD'] == 'y'):
 			rtp_conf['SGD_momentum'] = literal_eval(input('SGD momentum (0.0): ').strip())
 			rtp_conf['SGD_nesterov'] = input('SGD nesterov (y/n): ').strip()
-		rtp_conf['learn_rate'] = float(input('Learning rate (0.0002): ').strip())
 		rtp_conf_list.append(rtp_conf)
 	except: 
 		print("ERROR!\nUsing default values...")
@@ -172,17 +175,18 @@ for i, conf in enumerate(rtp_conf_list):
 		rtp_f.write('<D> hidden units1 (0):%d\n' % conf['d_hidden_units1'])
 		rtp_f.write('<D> leaky ReLU alpha (0.2):%f\n' % conf['d_LeReLU_alpha'])
 		rtp_f.write('<D> convolution filters (64):%d\n' % conf['d_conv_filters'])
+		rtp_f.write('<D> Learning rate (0.0002):%f\n' % conf['d_learn_rate'])
 		rtp_f.write('<G> embedding parameters (50):%d\n' % conf['g_embedding'])
 		rtp_f.write('<G> hidden layers1 (1):%d\n' % conf['g_hidden_layers1'])
 		rtp_f.write('<G> hidden layers2 (1):%d\n' % conf['g_hidden_layers2'])
 		rtp_f.write('<G> hidden units2 (128):%d\n' % conf['g_hidden_units_mult2'])
 		rtp_f.write('<G> deconvolution filters (128):%d\n' % conf['g_deconv_filters'])
 		rtp_f.write('<G> leaky ReLU alpha (0.2):%f\n' % conf['g_LeReLU_alpha'])
+		rtp_f.write('<G> Learning rate (0.0002):%f\n' % conf['g_learn_rate'])
 		rtp_f.write('SGD (y/n):' + conf['SGD'] + '\n')
 		if (conf['SGD'] == 'y'):
 			rtp_f.write('SGD momentum (0.0):%f\n' % conf['SGD_momentum'])
 			rtp_f.write('SGD nesterov (y/n):' + conf['SGD'] + '\n')
-		rtp_f.write('Learning rate (0.0002):%f\n' % conf['learn_rate'])
 		rtp_f.write('n_classes:%d\n' % rtp_n_classes)
 
 
@@ -330,9 +334,9 @@ def define_discriminator(in_shape=(28,28,1), n_classes=rtp_n_classes):
 	model = Model([in_image, in_label], out_layer)
 	# compile model
 	if (rtp_conf_list[rtp_list_index]['SGD'] == 'y'):
-		opt = SGD(learning_rate=rtp_conf_list[rtp_list_index]['learn_rate'], momentum=rtp_conf_list[rtp_list_index]['SGD_momentum'], nesterov=(rtp_conf_list[rtp_list_index]['SGD_nesterov']=='y'))
+		opt = SGD(learning_rate=rtp_conf_list[rtp_list_index]['d_learn_rate'], momentum=rtp_conf_list[rtp_list_index]['SGD_momentum'], nesterov=(rtp_conf_list[rtp_list_index]['SGD_nesterov']=='y'))
 	else:
-		opt = Adam(learning_rate=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
+		opt = Adam(learning_rate=rtp_conf_list[rtp_list_index]['d_learn_rate'], beta_1=0.5)
 	model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 	return model
 
@@ -392,9 +396,9 @@ def define_gan(g_model, d_model):
 	model = Model([gen_noise, gen_label], gan_output)
 	# compile model
 	if (rtp_conf_list[rtp_list_index]['SGD'] == 'y'):
-		opt = SGD(learning_rate=rtp_conf_list[rtp_list_index]['learn_rate'], momentum=rtp_conf_list[rtp_list_index]['SGD_momentum'], nesterov=(rtp_conf_list[rtp_list_index]['SGD_nesterov']=='y'))
+		opt = SGD(learning_rate=rtp_conf_list[rtp_list_index]['g_learn_rate'], momentum=rtp_conf_list[rtp_list_index]['SGD_momentum'], nesterov=(rtp_conf_list[rtp_list_index]['SGD_nesterov']=='y'))
 	else:
-		opt = Adam(learning_rate=rtp_conf_list[rtp_list_index]['learn_rate'], beta_1=0.5)
+		opt = Adam(learning_rate=rtp_conf_list[rtp_list_index]['g_learn_rate'], beta_1=0.5)
 	model.compile(loss='binary_crossentropy', optimizer=opt)
 	return model
 
