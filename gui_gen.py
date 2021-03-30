@@ -49,8 +49,7 @@ except:
 
 fig_update_interval = 350
 n_latent_dim = model.layers[1].input_shape[0][1] # I think this *always* works
-n_slider_frames = 4
-n_classes = 47
+n_slider_frames = 5
 col_w = 300
 col_h = 1000
 lat_scale = 1000
@@ -62,10 +61,13 @@ class GuiGen(tk.Frame):
 		self.frame = tk.Frame(parent)
 		self.frame.pack(side="top", fill="both", expand=True)
 		self.lat_pt = zeros((1, n_latent_dim), dtype='float32')
-		self.char_class = 10
+		self.char_class = 0
 		self.should_update_figure = False
 		self.slider_frames = []
 		self.sliders = []
+		self.class_slider = None
+		self.n_classes = tk.IntVar()
+		self.n_classes.set(47)
 		self.saved_vector = zeros((1, n_latent_dim), dtype='float32')
 		self.base_vector = zeros((1, n_latent_dim), dtype='float32')
 		self.createGUI()
@@ -91,9 +93,12 @@ class GuiGen(tk.Frame):
 		self.char_frame = tk.Frame(self.frame, width=col_w, height=col_h)
 		self.char_frame.pack_propagate(0)
 		self.char_frame.pack(side='left')
-		class_slider = tk.Scale(self.char_frame, repeatdelay=1000, repeatinterval=1000, from_=0, to=n_classes-1, length=col_w, label="Class ID",orient=tk.HORIZONTAL, command=self.update_char_class)
-		class_slider.set(self.char_class)
-		class_slider.place(relx=0.5, rely=0.4, anchor='c')
+		self.n_classes.trace_add('write', self.create_class_slider)
+		nc_label = tk.Label(self.char_frame, text='n_classes:', width=col_w//2)
+		nc_label.place(relx=0.4, rely=0.45, anchor='c')
+		class_bound_field = tk.Entry(self.char_frame, textvariable=self.n_classes, width=3)
+		class_bound_field.place(relx=0.7, rely=0.45, anchor='c')
+		self.create_class_slider()
 		self.randomBound = tk.Scale(self.char_frame, from_=0, to=3*lat_scale, label='Random Bound', length=col_w, orient=tk.HORIZONTAL)
 		self.randomBound.set(3*lat_scale)
 		self.randomBound.place(relx=0.5, rely=0.30, anchor='c')
@@ -160,6 +165,15 @@ class GuiGen(tk.Frame):
 			tk_fig.get_tk_widget().pack()
 		self.parent.after(fig_update_interval, self.updateFigure)
 
+	def create_class_slider(self, *args):
+		if (type(self.class_slider) is not NoneType):
+			self.class_slider.destroy()
+		try:
+			self.class_slider = tk.Scale(self.char_frame, repeatdelay=1000, repeatinterval=1000, from_=0, to=self.n_classes.get()-1, length=col_w, label="Class ID",orient=tk.HORIZONTAL, command=self.update_char_class)
+			self.class_slider.place(relx=0.5, rely=0.4, anchor='c')
+		except Exception:
+			pass
+		
 	def set_should_update_figure(self, new_should_update_figure):
 		self.should_update_figure = new_should_update_figure
 
