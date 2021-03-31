@@ -1,5 +1,6 @@
 # Use Tkinter for python 2, tkinter for python 3
 import tkinter as tk
+import imageio
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.pyplot import imshow
 from matplotlib.pyplot import axis
@@ -60,6 +61,28 @@ col_w = 300
 col_h = 1000
 lat_scale = 1000
 NoneType = type(None)
+trav_anim_figs = []
+
+def save_trav_anim():
+	path = tk.simpledialog.askstring(title="Save Location", prompt="Folder path:")
+	try:
+		os.mkdir(path)
+	except Exception as ex:
+		tk.messagebox.showinfo("Cannot save animation!", ex)
+		return
+	
+	gif_path = path + "/" + path + ".gif"
+	with imageio.get_writer(gif_path, mode='I') as writer:
+
+		for i, anim_fig in enumerate(trav_anim_figs):
+			f_name = path + '/frame%d.png' % i
+			anim_fig.savefig(f_name)
+			
+			image = imageio.imread(f_name)
+			writer.append_data(image)
+
+	success_str = "Animation has been saved as " + path + "/" + path + ".gif"
+	tk.messagebox.showinfo("Success!", success_str)
 
 class GuiGen(tk.Frame):
 	def __init__(self, parent):
@@ -124,8 +147,10 @@ class GuiGen(tk.Frame):
 		saveBaseBtn.place(relx=0.5, rely=0.14, anchor='c')
 		self.travAnimBtn = tk.Button(self.char_frame, text='Start Vector Animation', fg=red, command=self.animate_traversal)
 		self.travAnimBtn.place(relx=0.5, rely=0.11, anchor='c')
+		saveTravAnimBtn = tk.Button(self.char_frame, text='Save Vector Animation', command=save_trav_anim)
+		saveTravAnimBtn.place(relx=0.5, rely=0.08, anchor='c')
 		step_slider = tk.Scale(self.char_frame, label='Animation Step Size', variable=self.trav_step_size, from_=0, to=trav_vec_max, length=col_w, orient=tk.HORIZONTAL)
-		step_slider.place(relx=0.5, rely=0.05, anchor='c')
+		step_slider.place(relx=0.5, rely=0.03, anchor='c')
 		self.figureFrame = tk.Frame(self.char_frame)
 		self.set_should_update_figure(True)
 		self.parent.after(0, self.updateFigure)
@@ -172,6 +197,7 @@ class GuiGen(tk.Frame):
 	def animate_traversal(self):
 		self.trav_anim = not self.trav_anim
 		if (self.trav_anim):
+			trav_anim_figs.clear()
 			self.travAnimBtn.configure(fg=green, text="Stop Vector Animation")
 			self.step_trav_anim()
 		else:
@@ -189,7 +215,8 @@ class GuiGen(tk.Frame):
 				else:
 					self.class_slider.set(0)
 				self.vectorSlider.set(trav_vec_min)
-			self._updateFigure() # direct call to figure update
+			c_fig = self._updateFigure() # direct call
+			trav_anim_figs.append(c_fig)
 			self.parent.after(trav_anim_interval, self.step_trav_anim)
 
 	def updateFigure(self):
@@ -207,6 +234,7 @@ class GuiGen(tk.Frame):
 		
 		self.figureFrame.destroy()
 		self.figureFrame = tempFrame
+		return char_fig # for animation
 
 	def create_class_slider(self, *args):
 		if (type(self.class_slider) is not NoneType):
