@@ -62,9 +62,10 @@ col_h = 1000
 lat_scale = 1000
 NoneType = type(None)
 trav_anim_figs = []
+gif_speed = 0.15
 
 def save_trav_anim():
-	path = tk.simpledialog.askstring(title="Save Location", prompt="Folder path:")
+	path = tk.simpledialog.askstring(title="Save as...", prompt="Animation name:")
 	try:
 		os.mkdir(path)
 	except Exception as ex:
@@ -72,7 +73,7 @@ def save_trav_anim():
 		return
 	
 	gif_path = path + "/" + path + ".gif"
-	with imageio.get_writer(gif_path, mode='I') as writer:
+	with imageio.get_writer(gif_path, mode='I', duration=gif_speed) as writer:
 
 		for i, anim_fig in enumerate(trav_anim_figs):
 			f_name = path + '/frame%d.png' % i
@@ -80,6 +81,10 @@ def save_trav_anim():
 			
 			image = imageio.imread(f_name)
 			writer.append_data(image)
+			try:
+				os.remove(f_name)
+			except:
+				pass
 
 	success_str = "Animation has been saved as " + path + "/" + path + ".gif"
 	tk.messagebox.showinfo("Success!", success_str)
