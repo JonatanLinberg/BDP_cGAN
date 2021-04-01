@@ -99,11 +99,11 @@ for argi in range(1, len(argv)): # linked rtp-file
 		rtp_conf['g_LeReLU_alpha'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf['g_learn_rate'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		# other
+		rtp_conf['batch_size'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf['SGD'] = rtp_file.readline().split(':')[1].strip()
 		if (rtp_conf['SGD'] == 'y'):
 			rtp_conf['SGD_momentum'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 			rtp_conf['SGD_nesterov'] = rtp_file.readline().split(':')[1].strip()
-		rtp_conf['batch_size'] = rtp_file.readline().split(':')[1].strip()
 		rtp_conf_list.append(rtp_conf)
 
 if (len(rtp_conf_list) == 0):
@@ -127,16 +127,15 @@ if (len(rtp_conf_list) == 0):
 		rtp_conf['g_learn_rate'] = float(input('<G> Learning rate (0.0002): ').strip())
 
 		print(" < < Other > >")
+		rtp_conf['batch_size'] = literal_eval(input('Batch size (128): ').strip())
 		rtp_conf['SGD'] = input('SGD (y/n): ').strip()
 		if (rtp_conf['SGD'] == 'y'):
 			rtp_conf['SGD_momentum'] = literal_eval(input('SGD momentum (0.0): ').strip())
 			rtp_conf['SGD_nesterov'] = input('SGD nesterov (y/n): ').strip()
-		rtp_conf['batch_size'] = literal_eval(input('Batch size (128): ').strip())
 		rtp_conf_list.append(rtp_conf)
 	except: 
 		print("ERROR!\nUsing default values...")
 		rtp_conf_list.append(rtp_def_conf)
-
 
 visualize = (input('Only show models (y/n): ') == 'y')
 
@@ -187,11 +186,11 @@ for i, conf in enumerate(rtp_conf_list):
 		rtp_f.write('<G> leaky ReLU alpha (0.2):%f\n' % conf['g_LeReLU_alpha'])
 		rtp_f.write('<G> Learning rate (0.0002):%f\n' % conf['g_learn_rate'])
 		rtp_f.write('SGD (y/n):' + conf['SGD'] + '\n')
+		rtp_f.write('batch_size:%d\n' % conf['batch_size'])
 		if (conf['SGD'] == 'y'):
 			rtp_f.write('SGD momentum (0.0):%f\n' % conf['SGD_momentum'])
 			rtp_f.write('SGD nesterov (y/n):' + conf['SGD'] + '\n')
 		rtp_f.write('n_classes:%d\n' % rtp_n_classes)
-		rtp_f.write('batch_size:%d\n' % conf['batch_size'])
 
 
 # scale an array of images to a new size
