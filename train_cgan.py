@@ -137,14 +137,14 @@ if (len(rtp_conf_list) == 0):
 		print("ERROR!\nUsing default values...")
 		rtp_conf_list.append(rtp_def_conf)
 
-visualize = (input('Only show models (y/n): ') == 'y')
+visualize = (input('Only show model? (y/n): ') == 'y')
 
 rtp_mode_collapse_lim = 2.0
 
 # Training parameters
-rtp_fid_samples = 25		# number of fid-batch-samples
+rtp_fid_sample_size = 1600		# size of fid samples (x real and x fake)
 #rtp_train_n_batch = 128		# multiple of 16 	# MOVED TO RTP_CONF
-# > > > rtp_train_n_batch * rtp_fid_samples ≈ 5120
+# > > > rtp_train_n_batch * n_fid_samples ≈ 5120
 rtp_train_n_epochs = 100
 
 def untuple_list(l1):
@@ -457,19 +457,21 @@ def generate_fake_samples(generator, latent_dim, n_samples):
 	return [images, labels_input], y
 
 # train the generator and discriminator
-def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=rtp_train_n_epochs, n_batch=rtp_conf_list[rtp_list_index]['batch_size']):
+def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=rtp_train_n_epochs):
+	n_batch=rtp_conf_list[rtp_list_index]['batch_size']
 	bat_per_epo = int(dataset[0].shape[0] / n_batch)
 	half_batch = int(n_batch / 2)
 	fid_per_epo = 1 	# do not change this
 	fid_mod = int(round(bat_per_epo/fid_per_epo))
 	fid = 0
+	n_fid_samples = rtp_fid_sample_size // half_batch
 
 	# manually enumerate epochs
 	for i in range(n_epochs):
 		# create/empty fid-sampling arrays
-		fid_samples_fake = zeros((rtp_fid_samples, half_batch, 28, 28, 1))
+		fid_samples_fake = zeros((n_fid_samples, half_batch, 28, 28, 1))
 		fid_samples_fake = fid_samples_fake.astype('float32')
-		fid_samples_real = zeros((rtp_fid_samples, half_batch, 28, 28, 1))
+		fid_samples_real = zeros((n_fid_samples, half_batch, 28, 28, 1))
 		fid_samples_real = fid_samples_real.astype('float32')
 		fid_i_count = 0
 
@@ -490,7 +492,7 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 			# update the generator via the discriminator's error
 			g_loss = gan_model.train_on_batch([z_input, labels_input], y_gan)
 
-			if (j % fid_mod >= fid_mod-rtp_fid_samples):
+			if (j % fid_mod >= fid_mod-n_fid_samples):
 				# save images 10 times every epoch
 				fid_samples_fake[fid_i_count] = numpy.asarray([X_fake])
 				fid_samples_real[fid_i_count] = numpy.asarray([X_real])
@@ -509,8 +511,8 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 				(i+1, j+1, bat_per_epo, d_loss1, d_loss2, g_loss, acc1, acc2))
 
 		# Calculate FID after 1 epoch
-		fid_samples_fake = reshape(fid_samples_fake, [rtp_fid_samples*half_batch, 28, 28])
-		fid_samples_real = reshape(fid_samples_real, [rtp_fid_samples*half_batch, 28, 28])
+		fid_samples_fake = reshape(fid_samples_fake, [n_fid_samples*half_batch, 28, 28])
+		fid_samples_real = reshape(fid_samples_real, [n_fid_samples*half_batch, 28, 28])
 		
 		# convert integer to floating point values
 		fid_samples_fake = fid_samples_fake.astype('float32')
