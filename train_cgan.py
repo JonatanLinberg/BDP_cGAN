@@ -75,7 +75,8 @@ rtp_def_conf = {'d_embedding':50,
 				'g_learn_rate':0.0002,
 				'SGD':'n',
 				'SGD_momentum':0.0,
-				'SGD_nesterov':'n'}
+				'SGD_nesterov':'n',
+				'batch_size':128}
 rtp_conf_list = []
 rtp_list_index = 0
 for argi in range(1, len(argv)): # linked rtp-file
@@ -98,6 +99,7 @@ for argi in range(1, len(argv)): # linked rtp-file
 		rtp_conf['g_LeReLU_alpha'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf['g_learn_rate'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		# other
+		rtp_conf['batch_size'] = literal_eval(rtp_file.readline().split(':')[1].strip())
 		rtp_conf['SGD'] = rtp_file.readline().split(':')[1].strip()
 		if (rtp_conf['SGD'] == 'y'):
 			rtp_conf['SGD_momentum'] = literal_eval(rtp_file.readline().split(':')[1].strip())
@@ -125,6 +127,7 @@ if (len(rtp_conf_list) == 0):
 		rtp_conf['g_learn_rate'] = float(input('<G> Learning rate (0.0002): ').strip())
 
 		print(" < < Other > >")
+		rtp_conf['batch_size'] = literal_eval(input('Batch size (128): ').strip())
 		rtp_conf['SGD'] = input('SGD (y/n): ').strip()
 		if (rtp_conf['SGD'] == 'y'):
 			rtp_conf['SGD_momentum'] = literal_eval(input('SGD momentum (0.0): ').strip())
@@ -134,14 +137,13 @@ if (len(rtp_conf_list) == 0):
 		print("ERROR!\nUsing default values...")
 		rtp_conf_list.append(rtp_def_conf)
 
-
 visualize = (input('Only show models (y/n): ') == 'y')
 
 rtp_mode_collapse_lim = 2.0
 
 # Training parameters
 rtp_fid_samples = 25		# number of fid-batch-samples
-rtp_train_n_batch = 128		# multiple of 16
+#rtp_train_n_batch = 128		# multiple of 16 	# MOVED TO RTP_CONF
 # > > > rtp_train_n_batch * rtp_fid_samples ≈ 5120
 rtp_train_n_epochs = 100
 
@@ -184,6 +186,7 @@ for i, conf in enumerate(rtp_conf_list):
 		rtp_f.write('<G> leaky ReLU alpha (0.2):%f\n' % conf['g_LeReLU_alpha'])
 		rtp_f.write('<G> Learning rate (0.0002):%f\n' % conf['g_learn_rate'])
 		rtp_f.write('SGD (y/n):' + conf['SGD'] + '\n')
+		rtp_f.write('batch_size:%d\n' % conf['batch_size'])
 		if (conf['SGD'] == 'y'):
 			rtp_f.write('SGD momentum (0.0):%f\n' % conf['SGD_momentum'])
 			rtp_f.write('SGD nesterov (y/n):' + conf['SGD'] + '\n')
@@ -454,7 +457,7 @@ def generate_fake_samples(generator, latent_dim, n_samples):
 	return [images, labels_input], y
 
 # train the generator and discriminator
-def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=rtp_train_n_epochs, n_batch=rtp_train_n_batch):
+def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=rtp_train_n_epochs, n_batch=rtp_conf_list[rtp_list_index]['batch_size']):
 	bat_per_epo = int(dataset[0].shape[0] / n_batch)
 	half_batch = int(n_batch / 2)
 	fid_per_epo = 1 	# do not change this
