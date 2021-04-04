@@ -11,6 +11,6 @@
 <G> deconvolution filters (128):128
 <G> leaky ReLU alpha (0.2):0.100000
 <G> Learning rate (0.0002):0.000200
-SGD (y/n):n
 batch_size:128
+SGD (y/n):n
 n_classes:47
