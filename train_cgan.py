@@ -70,7 +70,7 @@ rtp_def_conf = {'d_embedding':50,
 				'g_hidden_layers1':1,
 				'g_hidden_layers2':1,
 				'g_hidden_units_mult2':128,
-				'g_deconv_filters':128,
+				'g_deconv_filters':256,
 				'g_LeReLU_alpha':0.1,
 				'g_learn_rate':0.0002,
 				'SGD':'n',
@@ -122,7 +122,7 @@ if (len(rtp_conf_list) == 0):
 		rtp_conf['g_hidden_layers1'] = literal_eval(input('<G> hidden layers1 (1): ').strip())
 		rtp_conf['g_hidden_layers2'] = literal_eval(input('<G> hidden layers2 (1): ').strip())
 		rtp_conf['g_hidden_units_mult2'] = literal_eval(input('<G> hidden unit mult2 (128): ').strip())
-		rtp_conf['g_deconv_filters'] = literal_eval(input('<G> deconvolution filters (128): ').strip())
+		rtp_conf['g_deconv_filters'] = literal_eval(input('<G> deconvolution filters (256): ').strip())
 		rtp_conf['g_LeReLU_alpha'] = literal_eval(input('<G> leaky ReLU alpha (0.2): ').strip())
 		rtp_conf['g_learn_rate'] = float(input('<G> Learning rate (0.0002): ').strip())
 
