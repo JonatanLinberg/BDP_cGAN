@@ -375,7 +375,7 @@ def define_generator(latent_dim, n_classes=rtp_n_classes):
 	gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
 	#print(gen.shape)
 	# upsample to 28x28
-	gen = Conv2DTranspose(rtp_conf_list[rtp_list_index]['g_deconv_filters'], (4,4), strides=(2,2), padding='same')(gen)
+	gen = Conv2DTranspose(rtp_conf_list[rtp_list_index]['g_deconv_filters']//2, (4,4), strides=(2,2), padding='same')(gen)
 	gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
 	#print(gen.shape)
 	# output
