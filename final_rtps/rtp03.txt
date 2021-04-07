@@ -1,7 +1,7 @@
 D_embedding:50
 D_hidden layers:0
 D_hidden units:0
-D_LeReLU alpha:0.2
+D_LeReLU alpha:0.05
 D_conv_filters:64
 D_learning_rate:0.0002
 G_embedding:50
