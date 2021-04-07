@@ -70,7 +70,7 @@ rtp_def_conf = {'d_embedding':50,
 				'g_hidden_layers1':1,
 				'g_hidden_layers2':1,
 				'g_hidden_units_mult2':128, # UNUSED - IS 4xg_deconv_filters
-				'g_deconv_filters':128,
+				'g_deconv_filters':64,
 				'g_LeReLU_alpha':0.1,
 				'g_learn_rate':0.0002,
 				'SGD':'n',
@@ -122,7 +122,7 @@ if (len(rtp_conf_list) == 0):
 		rtp_conf['g_hidden_layers1'] = literal_eval(input('<G> hidden layers1 (1): ').strip())
 		rtp_conf['g_hidden_layers2'] = literal_eval(input('<G> hidden layers2 (1): ').strip())
 		rtp_conf['g_hidden_units_mult2'] = literal_eval(input('<G> hidden unit mult2 (128): ').strip())
-		rtp_conf['g_deconv_filters'] = literal_eval(input('<G> deconvolution filters (128): ').strip())
+		rtp_conf['g_deconv_filters'] = literal_eval(input('<G> deconvolution filters (64): ').strip())
 		rtp_conf['g_LeReLU_alpha'] = literal_eval(input('<G> leaky ReLU alpha (0.2): ').strip())
 		rtp_conf['g_learn_rate'] = float(input('<G> Learning rate (0.0002): ').strip())
 
@@ -182,7 +182,7 @@ for i, conf in enumerate(rtp_conf_list):
 		rtp_f.write('<G> hidden layers1 (1):%d\n' % conf['g_hidden_layers1'])
 		rtp_f.write('<G> hidden layers2 (1):%d\n' % conf['g_hidden_layers2'])
 		rtp_f.write('<G> hidden units2 (128):%d\n' % conf['g_hidden_units_mult2'])
-		rtp_f.write('<G> deconvolution filters (128):%d\n' % conf['g_deconv_filters'])
+		rtp_f.write('<G> deconvolution filters (64):%d\n' % conf['g_deconv_filters'])
 		rtp_f.write('<G> leaky ReLU alpha (0.2):%f\n' % conf['g_LeReLU_alpha'])
 		rtp_f.write('<G> Learning rate (0.0002):%f\n' % conf['g_learn_rate'])
 		rtp_f.write('batch_size:%d\n' % conf['batch_size'])
