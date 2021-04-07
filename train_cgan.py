@@ -69,7 +69,7 @@ rtp_def_conf = {'d_embedding':50,
 				'g_embedding':50,
 				'g_hidden_layers1':1,
 				'g_hidden_layers2':1,
-				'g_hidden_units_mult2':128,
+				'g_hidden_units_mult2':128, # UNUSED - IS 4xg_deconv_filters
 				'g_deconv_filters':128,
 				'g_LeReLU_alpha':0.1,
 				'g_learn_rate':0.0002,
@@ -360,13 +360,13 @@ def define_generator(latent_dim, n_classes=rtp_n_classes):
 	# image generator input
 	in_lat = Input(shape=(latent_dim,))
 	# foundation for 7x7 image
-	n_nodes = rtp_conf_list[rtp_list_index]['g_hidden_units_mult2'] * 7 * 7
+	n_nodes = rtp_conf_list[rtp_list_index]['g_deconv_filters'] * 4 * 7 * 7
 	gen = Dense(n_nodes)(in_lat)
 	gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
 	for i in range(rtp_conf_list[rtp_list_index]['g_hidden_layers2']-1):
 		gen = Dense(n_nodes)(gen)
 		gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
-	gen = Reshape((7, 7, rtp_conf_list[rtp_list_index]['g_hidden_units_mult2']))(gen)
+	gen = Reshape((7, 7, rtp_conf_list[rtp_list_index]['g_deconv_filters'] * 4))(gen)
 	
 	# merge image gen and label input
 	merge = Concatenate()([gen, li])
