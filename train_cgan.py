@@ -51,7 +51,10 @@ mndata.gz = True
 ################################
 # rtp_ = runtime parameter
 # Folder and filename
-rtp_folder_name = input("enter name: ") + '/'
+if (len(argv) <= 1):
+	print("ERROR! At least one argument (run_name) needs to be supplied.")
+	quit()
+rtp_folder_name = argv[1] + '/'
 rtp_root_folder = rtp_folder_name
 # Dataset
 # Note! Training or testing is set in the load_real_samples function
@@ -79,7 +82,7 @@ rtp_def_conf = {'d_embedding':50,
 				'batch_size':128}
 rtp_conf_list = []
 rtp_list_index = 0
-for argi in range(1, len(argv)): # linked rtp-file
+for argi in range(2, len(argv)): # linked rtp-file
 	print('Reading RTPs from file: ', argv[argi])
 	with open(argv[argi], 'r') as rtp_file:
 		# Discriminator parameters
