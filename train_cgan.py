@@ -51,7 +51,10 @@ mndata.gz = True
 ################################
 # rtp_ = runtime parameter
 # Folder and filename
-rtp_folder_name = input("enter name: ") + '/'
+if (len(argv) <= 1):
+	print("ERROR! At least one argument (run_name) needs to be supplied.")
+	quit()
+rtp_folder_name = argv[1] + '/'
 rtp_root_folder = rtp_folder_name
 # Dataset
 # Note! Training or testing is set in the load_real_samples function
@@ -69,8 +72,8 @@ rtp_def_conf = {'d_embedding':50,
 				'g_embedding':50,
 				'g_hidden_layers1':1,
 				'g_hidden_layers2':1,
-				'g_hidden_units_mult2':128,
-				'g_deconv_filters':128,
+				'g_hidden_units_mult2':0, # UNUSED - IS 4xg_deconv_filters
+				'g_deconv_filters':64,
 				'g_LeReLU_alpha':0.1,
 				'g_learn_rate':0.0002,
 				'SGD':'n',
@@ -79,7 +82,7 @@ rtp_def_conf = {'d_embedding':50,
 				'batch_size':128}
 rtp_conf_list = []
 rtp_list_index = 0
-for argi in range(1, len(argv)): # linked rtp-file
+for argi in range(2, len(argv)): # linked rtp-file
 	print('Reading RTPs from file: ', argv[argi])
 	with open(argv[argi], 'r') as rtp_file:
 		# Discriminator parameters
@@ -122,7 +125,7 @@ if (len(rtp_conf_list) == 0):
 		rtp_conf['g_hidden_layers1'] = literal_eval(input('<G> hidden layers1 (1): ').strip())
 		rtp_conf['g_hidden_layers2'] = literal_eval(input('<G> hidden layers2 (1): ').strip())
 		rtp_conf['g_hidden_units_mult2'] = literal_eval(input('<G> hidden unit mult2 (128): ').strip())
-		rtp_conf['g_deconv_filters'] = literal_eval(input('<G> deconvolution filters (128): ').strip())
+		rtp_conf['g_deconv_filters'] = literal_eval(input('<G> deconvolution filters (64): ').strip())
 		rtp_conf['g_LeReLU_alpha'] = literal_eval(input('<G> leaky ReLU alpha (0.2): ').strip())
 		rtp_conf['g_learn_rate'] = float(input('<G> Learning rate (0.0002): ').strip())
 
@@ -137,7 +140,7 @@ if (len(rtp_conf_list) == 0):
 		print("ERROR!\nUsing default values...")
 		rtp_conf_list.append(rtp_def_conf)
 
-visualize = (input('Only show model? (y/n): ') == 'y')
+visualize = False #(input('Only show model? (y/n): ') == 'y')
 
 rtp_mode_collapse_lim = 2.0
 
@@ -182,7 +185,7 @@ for i, conf in enumerate(rtp_conf_list):
 		rtp_f.write('<G> hidden layers1 (1):%d\n' % conf['g_hidden_layers1'])
 		rtp_f.write('<G> hidden layers2 (1):%d\n' % conf['g_hidden_layers2'])
 		rtp_f.write('<G> hidden units2 (128):%d\n' % conf['g_hidden_units_mult2'])
-		rtp_f.write('<G> deconvolution filters (128):%d\n' % conf['g_deconv_filters'])
+		rtp_f.write('<G> deconvolution filters (64):%d\n' % conf['g_deconv_filters'])
 		rtp_f.write('<G> leaky ReLU alpha (0.2):%f\n' % conf['g_LeReLU_alpha'])
 		rtp_f.write('<G> Learning rate (0.0002):%f\n' % conf['g_learn_rate'])
 		rtp_f.write('batch_size:%d\n' % conf['batch_size'])
@@ -318,9 +321,9 @@ def define_discriminator(in_shape=(28,28,1), n_classes=rtp_n_classes):
 	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
 	#print(fe.shape)
 	# downsample
-	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(1,1), padding='same')(fe)
+	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters']*2, (3,3), strides=(1,1), padding='same')(fe)
 	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
-	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters'], (3,3), strides=(2,2), padding='same')(fe)
+	fe = Conv2D(rtp_conf_list[rtp_list_index]['d_conv_filters']*2, (3,3), strides=(2,2), padding='same')(fe)
 	#print(fe.shape)
 	fe = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['d_LeReLU_alpha'])(fe)
 	#print(fe.shape)
@@ -360,13 +363,13 @@ def define_generator(latent_dim, n_classes=rtp_n_classes):
 	# image generator input
 	in_lat = Input(shape=(latent_dim,))
 	# foundation for 7x7 image
-	n_nodes = rtp_conf_list[rtp_list_index]['g_hidden_units_mult2'] * 7 * 7
+	n_nodes = rtp_conf_list[rtp_list_index]['g_deconv_filters'] * 4 * 7 * 7
 	gen = Dense(n_nodes)(in_lat)
 	gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
 	for i in range(rtp_conf_list[rtp_list_index]['g_hidden_layers2']-1):
 		gen = Dense(n_nodes)(gen)
 		gen = LeakyReLU(alpha=rtp_conf_list[rtp_list_index]['g_LeReLU_alpha'])(gen)
-	gen = Reshape((7, 7, rtp_conf_list[rtp_list_index]['g_hidden_units_mult2']))(gen)
+	gen = Reshape((7, 7, rtp_conf_list[rtp_list_index]['g_deconv_filters'] * 4))(gen)
 	
 	# merge image gen and label input
 	merge = Concatenate()([gen, li])
