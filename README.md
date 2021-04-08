@@ -1,9 +1,6 @@
-# Hyperparameters for GenerativeAdversarial Network Training
-## Conditional GAN on the EMNIST dataset
-Bachelor Degree Project in Information Technology
-
-IT613G, University of Skövde
-
+# Hyperparameters for GenerativeAdversarial Network Training - Conditional GAN on the EMNIST dataset
+Bachelor Degree Project in Information Technology  
+IT613G, University of Skövde  
 Alexander Gustafsson, Jonatan Linberg
 
 ### References
