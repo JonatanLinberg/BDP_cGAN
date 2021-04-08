@@ -146,7 +146,7 @@ visualize = False #(input('Only show model? (y/n): ') == 'y')
 rtp_mode_collapse_lim = 2.0
 
 # Training parameters
-rtp_fid_sample_size = 1600		# size of fid samples (x real and x fake)
+rtp_fid_sample_size = 2560		# size of fid samples (x real and x fake)
 #rtp_train_n_batch = 128		# multiple of 16 	# MOVED TO RTP_CONF
 # > > > rtp_train_n_batch * n_fid_samples ≈ 5120
 rtp_train_n_epochs = 100
