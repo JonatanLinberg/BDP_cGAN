@@ -72,7 +72,7 @@ rtp_def_conf = {'d_embedding':50,
 				'g_embedding':50,
 				'g_hidden_layers1':1,
 				'g_hidden_layers2':1,
-				'g_hidden_units_mult2':128, # UNUSED - IS 4xg_deconv_filters
+				'g_hidden_units_mult2':0, # UNUSED - IS 4xg_deconv_filters
 				'g_deconv_filters':64,
 				'g_LeReLU_alpha':0.1,
 				'g_learn_rate':0.0002,
