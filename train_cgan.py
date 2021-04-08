@@ -43,6 +43,7 @@ from scipy.linalg import sqrtm
 from skimage.transform import resize
 from mnist import MNIST
 from sys import argv
+from datetime import datetime as dt
 
 mndata = MNIST('./emnist_data')
 mndata.gz = True
@@ -513,6 +514,9 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 			print('>E %d B %d/%d\td_loss_real=%.3f\td_loss_fake=%.3f\tg_loss=%.3f\td_acc_real=%.3f\td_acc_fake=%.3f' %
 				(i+1, j+1, bat_per_epo, d_loss1, d_loss2, g_loss, acc1, acc2))
 
+		# Time fid calculation
+		t_fid = dt.now()
+
 		# Calculate FID after 1 epoch
 		fid_samples_fake = reshape(fid_samples_fake, [n_fid_samples*half_batch, 28, 28])
 		fid_samples_real = reshape(fid_samples_real, [n_fid_samples*half_batch, 28, 28])
@@ -530,6 +534,7 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, fid_model, n_epochs=
 		print("calculating FID with sample size: n_real: %d, n_fake: %d" % (fid_samples_real.shape[0], fid_samples_fake.shape[0]))
 		fid = calculate_fid(fid_model, fid_samples_fake, fid_samples_real)
 		print(" ->->-> FID for epoch %d: %.03f" % (i + 1, fid))
+		print(" FID calc time: %d" % (dt.now()-t_fid))
 
 		img_ex_count = 10
 		[img_lat_pnt, img_lbl] = generate_latent_points(latent_dim, img_ex_count*rtp_n_classes)
