@@ -140,7 +140,7 @@ if (len(rtp_conf_list) == 0):
 		print("ERROR!\nUsing default values...")
 		rtp_conf_list.append(rtp_def_conf)
 
-visualize = (input('Only show model? (y/n): ') == 'y')
+visualize = False #(input('Only show model? (y/n): ') == 'y')
 
 rtp_mode_collapse_lim = 2.0
 
