@@ -1,6 +1,6 @@
 import os
 
-python_interpreter = "python3"
+python_interpreter = "python"
 training_program = "train_cgan.py"
 duplicates = 10
 exmo_folder = "final_exmos"
