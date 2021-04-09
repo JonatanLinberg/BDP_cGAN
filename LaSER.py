@@ -1,6 +1,6 @@
 # Use Tkinter for python 2, tkinter for python 3
-print(' Latent Space Explorer',
-    '\n[=====================]\n',
+print(' Latent Space Explorer and Recorder (LaSER)',
+    '\n[==========================================]\n',
 	'\nStarting...')
 
 import tkinter as tk
