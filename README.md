@@ -19,8 +19,8 @@ Training a cGAN can be accomplished by running the train_cgan code, "python trai
 ### Tools
 #### Latent Space Explorer and Recorder (LaSER.py)
 ##### Usage:
- * "python lse.py" and enter the model file when prompted or
- * "python lse.py <model.h5\>"
+ * "python LaSER.py" and enter the model file when prompted or
+ * "python LaSER.py <model.h5\>"
 
 The program features one slider for each latent dimension, for exploration the latent space. The user can define a vector in the space to traverse and even create an animation. 
 
