@@ -1,4 +1,6 @@
 # example of loading the generator model and generating images
+print(' Character Generator',
+	'\n[===================]\n')
 from numpy import asarray
 from numpy import array
 from numpy import zeros
@@ -183,21 +185,40 @@ if (len(argv) > 1):
 						print('Invalid number of dimensions!\nusage:\n\t"python gen_cGAN.py -l <number of dims>"')
 				elif (opt == 'L'):
 					try:
-						lat_map_range = int(argv[i+1])
+						lat_map_range = float(argv[i+1])*2
 					except:
 						print('Invalid latent map range!\nusage:\n\t"python gen_cGAN.py -L <lat_map_range>"')
 				elif (opt == 'd'):
 					try:
-						in_dim[int(arg[j+1])-1] = int(argv[i+1])
+						if (arg[j+1] == 'x'):
+							in_dim[1] = int(argv[i+1])
+						elif (arg[j+1] == 'y'):
+							in_dim[0] = int(argv[i+1])
+						else:
+							raise Exception
 					except:
-						print('Invalid latent dim specification!\nusage:\n\t"python gen_cGAN.py -dx <dimension for dim #x>"')
+						print('Invalid latent dim specification!\nusage:\n\t" -dx <latent space dim> " or " -dy <latent space dim> "')
 				elif (opt == 'C'):
 					try:
 						in_char_id = int(argv[i+1])
 					except:
 						print('Invalid char ID!\nusage:\n\t"python gen_cGAN.py -C <char ID>"')
+				elif (opt == 'H'):
+					print(	'" -f <model.h5> ":\t- Load generator from file "model.h5"', 
+							'" -c <n_classes> ":\t- Integer, number of data classes',
+							'" -C <n_classes> ":\t- Integer, character class',
+							'" -r <n_rows>":\t\t- Integer, number of rows to be generated',
+							'" -t ":\t\t\t- Text generation mode',
+							'" -w <width>":\t\t- Integer, row width for text generation mode',
+							'" -L <latent_std>":\t- Float, standard deviation for latent space map',
+							'" -dx <latent_dim>":\t- Integer, specifies latent dimension for map dimension x',
+							'" -dy <latent_dim>":\t- Integer, specifies latent dimension for map dimension y',
+							'" -e ":\t\t\t- Euclidean Box-Plot mode, calculates and shows euclidean distance in the generated images',
+							sep='\n')
+					quit()
 
 						
+print('Use "python char_gen.py -H" for a list of all options')
 
 if (f_name == ""):
 	f_name = input('Enter generator file name: ')

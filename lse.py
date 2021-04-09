@@ -1,4 +1,8 @@
 # Use Tkinter for python 2, tkinter for python 3
+print(' Latent Space Explorer',
+    '\n[=====================]\n',
+	'\nStarting...')
+
 import tkinter as tk
 import imageio
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
