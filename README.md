@@ -11,7 +11,7 @@ Alexander Gustafsson, Jonatan Linberg
    * https://machinelearningmastery.com/how-to-implement-the-frechet-inception-distance-fid-from-scratch/ (FID)
 
 ### Training a cGAN
-Training a cGAN can be accomplished by running the train_cgan code, "python train_cgan.py <save_path>". The user can enter runtime parameters when prompted or load them from a file, "python train_cgan.py <save_path> <RTP-file>".
+Training a cGAN can be accomplished by running the train_cgan code, "python train_cgan.py <save_path\>". The user can enter runtime parameters when prompted or load them from a file, "python train_cgan.py <save_path\> <RTP file\>".
 
 ### Experiment Data
 -- _To be added at a later date_ --
@@ -20,7 +20,7 @@ Training a cGAN can be accomplished by running the train_cgan code, "python trai
 #### Latent Space Explorer (lse.py)
 ##### Usage:
  * "python lse.py" and enter the model file when prompted or
- * "python lse.py <model.h5>"
+ * "python lse.py <model.h5\>"
 
 The program features one slider for each latent dimension, for exploration the latent space. The user can define a vector in the space to traverse and even create an animation. 
 
@@ -32,6 +32,6 @@ The program can be used to generate characters and text using a generator model.
 
 #### Result plotting (plot_results.py)
 ##### Usage:
-* "python plot_results.py <results_csv file>"
+* "python plot_results.py <results_csv file\>"
 
 The program can present various graphs of the data collected from a training run. 
