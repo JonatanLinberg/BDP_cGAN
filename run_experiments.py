@@ -17,7 +17,8 @@ for i in range(exmo_count):
 	command = python_interpreter + " " + training_program + " exmo" + str(i)
 	for j in range(duplicates):
 		command = command + " " + exmo_paths[i]
-	command = command + " &"
+	command = command + " &"			# bash
+	# command = "start " + command		# windows
 	commands.append(command)
 
 for c in commands:
