@@ -26,7 +26,7 @@ Training a cGAN can be accomplished by running the train_cgan code, `python trai
 -- _To be added at a later date_ --
 
 ### Tools
-#### Latent Space Explorer and Recorder [LaSER.py](/blob/master/LaSER.py)
+#### Latent Space Explorer and Recorder ([LaSER.py](/LaSER.py))
 The program features one slider for each latent dimension, for exploration the latent space. The user can define a vector in the space to traverse and even create an animation. 
 
 ##### Usage:
@@ -34,14 +34,14 @@ The program features one slider for each latent dimension, for exploration the l
  * `python LaSER.py <model.h5>`
 
 
-#### Character Generator (char_gen.py)
+#### Character Generator ([char_gen.py](/char_gen.py))
 The program can be used to generate characters and text using a generator model. A full list of options can be found by using the "-H" option. Can also evaluate the euclidean distance between the generated images and present them as a box plot.
 
 ##### Usage:
 * `python char_gen.py -[options]`
 
 
-#### Result plotting (plot_results.py)
+#### Result plotting ([plot_results.py](plot_results.py))
 The program can present various graphs of the data collected from a training run. 
 
 ##### Usage:
