@@ -15,6 +15,7 @@ from numpy import zeros
 from numpy import array
 from functools import partial
 from sys import argv
+from sys import stderr
 import os
 from datetime import datetime as dt
 from math import ceil
@@ -22,6 +23,21 @@ os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
 os.environ["CUDA_VISIBLE_DEVICES"] = '-1'
 from tensorflow.keras.models import load_model
 import tensorflow as tf
+
+fig_update_interval = 350
+trav_anim_interval = 350
+trav_vec_min = -500
+trav_vec_max = 500
+red = "#EE2211"
+green = "#11BB2A"
+n_slider_frames = 5
+col_w = 300
+col_h = 1000
+lat_scale = 1000
+NoneType = type(None)
+trav_anim_figs = []
+gif_speed = 0.15
+
 
 # generate points in latent space as input for the generator
 def generate_latent_point(latent_dim):
@@ -42,31 +58,6 @@ def generate_figure(model, latent_point, class_label):
 	ax.tick_params(which='both', bottom=False, top=False, left=False, right=False, labelbottom=False, labeltop=False, labelleft=False, labelright=False)
 	ax = imshow(out[0, :, :, 0], cmap='gray_r')
 	return fig 
-
-if (len(argv) > 1):
-	f_name = argv[1]
-else:
-	f_name = input("Enter generator model (.h5) file: ")
-try:
-	model = load_model(f_name)
-except:
-	print("Cannot read model file")
-	quit()
-
-fig_update_interval = 350
-trav_anim_interval = 350
-trav_vec_min = -500
-trav_vec_max = 500
-red = "#EE2211"
-green = "#11BB2A"
-n_latent_dim = model.layers[1].input_shape[0][1] # I think this *always* works
-n_slider_frames = 5
-col_w = 300
-col_h = 1000
-lat_scale = 1000
-NoneType = type(None)
-trav_anim_figs = []
-gif_speed = 0.15
 
 def save_trav_anim():
 	path = tk.simpledialog.askstring(title="Save as...", prompt="Animation name:")
@@ -94,11 +85,13 @@ def save_trav_anim():
 	tk.messagebox.showinfo("Success!", success_str)
 
 class GuiGen(tk.Frame):
-	def __init__(self, parent):
+	def __init__(self, parent, model):
 		self.parent = parent
+		self.model = model
+		self.n_latent_dim = self.model.layers[1].input_shape[0][1] # I think this *always* works
 		self.frame = tk.Frame(parent)
 		self.frame.pack(side="top", fill="both", expand=True)
-		self.lat_pt = zeros((1, n_latent_dim), dtype='float32')
+		self.lat_pt = zeros((1, self.n_latent_dim), dtype='float32')
 		self.char_class = 0
 		self.should_update_figure = False
 		self.slider_frames = []
@@ -106,8 +99,8 @@ class GuiGen(tk.Frame):
 		self.class_slider = None
 		self.n_classes = tk.IntVar()
 		self.n_classes.set(47)
-		self.saved_vector = zeros((1, n_latent_dim), dtype='float32')
-		self.base_vector = zeros((1, n_latent_dim), dtype='float32')
+		self.saved_vector = zeros((1, self.n_latent_dim), dtype='float32')
+		self.base_vector = zeros((1, self.n_latent_dim), dtype='float32')
 		self.trav_anim = False
 		self.travAnimBtn = None
 		self.trav_step_size = tk.IntVar()
@@ -121,7 +114,7 @@ class GuiGen(tk.Frame):
 			self.slider_frames[i].pack_propagate(0)
 			self.slider_frames[i].pack(side='left')
 
-		n_rows = ceil(n_latent_dim/n_slider_frames)
+		n_rows = ceil(self.n_latent_dim/n_slider_frames)
 		for i, dim in enumerate(self.lat_pt[0]):
 			c_delta = i % n_rows
 			c_r = int(127 + 64 * ((c_delta%3))) % 256
@@ -183,12 +176,12 @@ class GuiGen(tk.Frame):
 			self.set_slider_val(i, dim*lat_scale)
 
 	def randomise_latent_point(self):
-		new_lat_pt = generate_latent_point(n_latent_dim) * (int(self.randomBound.get())/(3*lat_scale))
+		new_lat_pt = generate_latent_point(self.n_latent_dim) * (int(self.randomBound.get())/(3*lat_scale))
 		for i, dim in enumerate(new_lat_pt[0]):
 			self.set_slider_val(i, dim*lat_scale)
 
 	def normalise_latent_point(self):
-		for i in range(n_latent_dim):
+		for i in range(self.n_latent_dim):
 			self.set_slider_val(i, 0)
 
 	def set_slider_val(self, i, new_val):
@@ -235,7 +228,7 @@ class GuiGen(tk.Frame):
 		self.parent.after(fig_update_interval, self.updateFigure)
 
 	def _updateFigure(self):
-		char_fig = generate_figure(model, self.lat_pt, self.char_class)
+		char_fig = generate_figure(self.model, self.lat_pt, self.char_class)
 		tempFrame = tk.Frame(self.char_frame)
 		tempFrame.place(relx=0.5, rely=0.75, anchor='c')
 		tk_fig = FigureCanvasTkAgg(char_fig, tempFrame)
@@ -265,4 +258,16 @@ class GuiGen(tk.Frame):
 
 if __name__ == "__main__":
 	root = tk.Tk()
-	GuiGen(root).mainloop()
+	root.title("La.S.E.R.")
+	root.minsize(col_w*(n_slider_frames+1), col_h)
+	if (len(argv) > 1):
+		f_name = argv[1]
+	else:
+		f_name = tk.filedialog.askopenfilename(title="Select Generator File", initialdir="./", filetypes=[("Model file", "*.h5")])
+	try:
+		model = load_model(f_name)
+	except:
+		print("Cannot read model file", file=stderr)
+		quit()
+
+	GuiGen(root, model).mainloop()
