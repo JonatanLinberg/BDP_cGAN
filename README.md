@@ -3,6 +3,12 @@ Bachelor Degree Project in Information Technology
 IT613G, University of Skövde  
 Alexander Gustafsson, Jonatan Linberg
 
+### Contents
+ * [Code Sources](#Code-Sources)
+ * [Training a cGAN](#Training-a-cGAN)
+ * [Experiment Data](#Experiment-Data)
+ * [Tools](#Tools)
+
 ### Code Sources
  * The project is built around the **EMNIST** dataset, available from:
    * https://github.com/sorki/python-mnist
