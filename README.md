@@ -20,7 +20,7 @@ Alexander Gustafsson, Jonatan Linberg
    * https://machinelearningmastery.com/how-to-implement-the-frechet-inception-distance-fid-from-scratch/ (FID)
 
 ### Training a cGAN
-Training a cGAN can be accomplished by running the train_cgan code, "python train_cgan.py <save_path\>". The user can enter runtime parameters when prompted or load them from a file, "python train_cgan.py <save_path\> <RTP file\>".
+Training a cGAN can be accomplished by running the train_cgan code, `python train_cgan.py <save_path>`. The user can enter runtime parameters when prompted or load them from a file, `python train_cgan.py <save_path> <RTP file>`. Alternatively, one can run a multi-model experiment using the run_experience.py-script, however the variables in the script will need to be adjusted for each experiment. 
 
 ### Experiment Data
 -- _To be added at a later date_ --
@@ -31,7 +31,7 @@ The program features one slider for each latent dimension, for exploration the l
 
 ##### Usage:
  * `python LaSER.py` and enter the model file when prompted or
- * `python LaSER.py <model.h5\>`
+ * `python LaSER.py <model.h5>`
 
 
 #### Character Generator (char_gen.py)
@@ -45,4 +45,4 @@ The program can be used to generate characters and text using a generator model.
 The program can present various graphs of the data collected from a training run. 
 
 ##### Usage:
-* `python plot_results.py <results_csv file\>`
+* `python plot_results.py <results_csv file>`
