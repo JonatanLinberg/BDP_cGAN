@@ -8,6 +8,9 @@ Alexander Gustafsson, Jonatan Linberg
  * [Training a cGAN](#Training-a-cGAN)
  * [Experiment Data](#Experiment-Data)
  * [Tools](#Tools)
+   * [Latent Space Explorer and Recorder (LaSER)](#latent-space-explorer-and-recorder-laserpy)
+   * [Character Generator](#character-generator-char_genpy)
+   * [Result Plotting](#result-plotting-plot_resultspy)
 
 ### Code Sources
  * The project is built around the **EMNIST** dataset, available from:
