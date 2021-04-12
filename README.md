@@ -20,7 +20,7 @@ Alexander Gustafsson, Jonatan Linberg
    * https://machinelearningmastery.com/how-to-implement-the-frechet-inception-distance-fid-from-scratch/ (FID)
 
 ### Training a cGAN
-Training a cGAN can be accomplished by running the train_cgan code, `python train_cgan.py <save_path>`. The user can enter runtime parameters when prompted or load them from a file, `python train_cgan.py <save_path> <RTP file>`. Alternatively, one can run a multi-model experiment using the run_experience.py-script, however the variables in the script will need to be adjusted for each experiment. 
+Training a cGAN can be accomplished by running the [train_cgan](/train_cgan.py) code, `python train_cgan.py <save_path>`. The user can enter runtime parameters when prompted or load them from a file, `python train_cgan.py <save_path> <RTP file>`. Alternatively, one can run a multi-model experiment using the run_experience.py-script, however the variables in the script will need to be adjusted for each experiment. 
 
 ### Experiment Data
 -- _To be added at a later date_ --
