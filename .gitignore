@@ -1,6 +1,5 @@
 /.idea
 emnist_data
-/mnist
 /venv
 *.h5
 !best*.h5
