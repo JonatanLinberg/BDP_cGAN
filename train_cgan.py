@@ -45,7 +45,7 @@ from mnist import MNIST
 from sys import argv
 from datetime import datetime as dt
 
-mndata = MNIST('./emnist_data')
+mndata = MNIST('./python-mnist/emnist_data')
 mndata.gz = True
 
 # SETUP

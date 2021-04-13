@@ -1,5 +1,5 @@
 /.idea
-/emnist_data
+emnist_data
 /mnist
 /venv
 *.h5
