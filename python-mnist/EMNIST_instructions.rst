@@ -15,8 +15,6 @@ Requirements
 Usage
 -----
 
--  ``git clone https://github.com/sorki/python-mnist``
-
 -  ``cd python-mnist``
 
 -  Get MNIST data:
