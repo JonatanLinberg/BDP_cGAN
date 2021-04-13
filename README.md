@@ -13,7 +13,7 @@ Alexander Gustafsson, Jonatan Linberg
    * [Result Plotting](#result-plotting-plot_resultspy)
 
 ### Code Sources
- * The project is built around the **EMNIST** dataset, available from ([python-mnist](/python-mnist/)) or :
+ * The project is built around the **EMNIST** dataset, available from [python-mnist](/python-mnist/) or :
    * https://github.com/sorki/python-mnist
  * The initial **cGAN** and **FID** code (train_cgan.py) was developed by Jason Brownlee, available from: 
    * https://machinelearningmastery.com/how-to-develop-a-conditional-generative-adversarial-network-from-scratch/ (cGAN)
