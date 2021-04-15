@@ -55,9 +55,9 @@ if (len(df_list) > 1):
 		ax[i, 1].set_ylabel('accuracy')
 		ax[i, 2].plot(df_list[i]['FID'])
 		ax[i, 2].set_ylabel('FID')
-		ax[i, 3].plot(((df_list[i]['d_loss_fake'] + df_list[i]['d_loss_real']) / (2*df_list[i]['g_loss'])))
+		ax[i, 3].plot((df_list[i]['g_loss'] - ((df_list[i]['d_loss_fake'] + df_list[i]['d_loss_real']) / 2)))
 		ax[i, 3].set_ylim(top=1.5)
-		ax[i, 3].set_ylabel('Loss ratio')
+		ax[i, 3].set_ylabel('Loss difference')
 	for i in range(len(ax)):
 		ax[i, 0].set_title(filenames[i], loc='left')
 		for a in ax[i]:
@@ -91,9 +91,9 @@ else:
 			df['FID'].plot()
 			plt.ylabel('FID')
 		elif (choice == 5):
-			((df['d_loss_fake'] + df['d_loss_real']) / (2*df['g_loss'])).plot()
+			(df['g_loss'] - ((df['d_loss_fake'] + df['d_loss_real'])/2)).plot()
 			plt.ylim(top=1.5)
-			plt.ylabel('Loss ratio')
+			plt.ylabel('Loss difference')
 		plt.xlabel('number of batches')
 		plt.ylim(bottom=0)
 
