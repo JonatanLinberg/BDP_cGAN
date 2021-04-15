@@ -1,7 +1,7 @@
 # Use Tkinter for python 2, tkinter for python 3
 print(' Latent Space Explorer and Recorder (LaSER)',
     '\n[==========================================]\n',
-	'\nStarting...')
+	'\nLoading', end='', flush=True)
 
 import tkinter as tk
 import imageio
@@ -13,6 +13,7 @@ from matplotlib.pyplot import close as plt_close
 from numpy.random import randn
 from numpy import zeros
 from numpy import array
+print('.', end='', flush=True)
 from functools import partial
 from sys import argv
 from sys import stderr
@@ -21,8 +22,11 @@ from datetime import datetime as dt
 from math import ceil
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
 os.environ["CUDA_VISIBLE_DEVICES"] = '-1'
+print('.', end='', flush=True)
 from tensorflow.keras.models import load_model
+print('.')
 import tensorflow as tf
+print('Starting...')
 
 fig_update_interval = 350
 trav_anim_interval = 350
