@@ -1,6 +1,6 @@
 /.idea
-/emnist_data
-/mnist
+emnist_data
+mnist
 /python_mnist.egg-info
 /venv
 *.h5
