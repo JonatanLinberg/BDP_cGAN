@@ -91,7 +91,7 @@ else:
 			df['FID'].plot()
 			plt.ylabel('FID')
 		elif (choice == 5):
-			(df['g_loss'] - ((df['d_loss_fake'] + df['d_loss_real'])/2)).plot()
+			(df['g_loss'] - df['d_loss_fake']).plot()
 			plt.ylim(top=1.5)
 			plt.ylabel('Loss difference')
 		plt.xlabel('number of batches')
