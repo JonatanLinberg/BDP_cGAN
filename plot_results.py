@@ -26,7 +26,7 @@ for file in filenames:
 	print("Reading", file, "as CSV file...")
 	df = pd.read_csv(file, names=['d_loss_real','d_loss_fake','g_loss', 'd_acc_real', 'd_acc_fake','FID'])
 	#print(df.head())
-	df = df.interpolate()
+	df = df.fillna(method='ffill')
 	#print(df.head())
 	df = df.rolling(win_size).mean()
 	df_list.append(df)
