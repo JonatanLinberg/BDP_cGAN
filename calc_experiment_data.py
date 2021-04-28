@@ -16,6 +16,12 @@ DEBUG = False
 with open("derived_results_csv.txt", 'w') as out_file: # create file
 	out_file.write("exmo, fid_1, fid_2, stab_1, stab_2, stab_3, stab_4\n")
 
+def out_str(input):
+	if (input == -1):
+		return ""
+	else:
+		return str(input)
+
 for path, name, files in os.walk(experiment_folder):
 	for file in files:
 		if (file == result_file_name):
@@ -97,12 +103,12 @@ for path, name, files in os.walk(experiment_folder):
 			
 			with open("derived_results_csv.txt", 'a') as results_out:
 				out = path.split("/")[1] + '_' + str(path.split("/")[2]) + ', ' + \
-						str(bat_fid_1) + ', ' + \
-						str(bat_fid_2) + ', ' + \
-						str(bat_stab_1) + ', ' + \
-						str(bat_stab_2) + ', ' + \
-						str(bat_stab_3) + ', ' + \
-						str(bat_stab_4)
+						out_str(bat_fid_1) + ', ' + \
+						out_str(bat_fid_2) + ', ' + \
+						out_str(bat_stab_1) + ', ' + \
+						out_str(bat_stab_2) + ', ' + \
+						out_str(bat_stab_3) + ', ' + \
+						out_str(bat_stab_4)
 				results_out.write(out + "\n")
 
 print("DONE!")
