@@ -13,6 +13,9 @@ experiment_folder = "final_experiment"
 result_file_name = "results_csv.txt"
 DEBUG = False
 
+with open("derived_results_csv.txt", 'w') as out_file: # create file
+	out_file.write("exmo, fid_1, fid_2, stab_1, stab_2, stab_3, stab_4\n")
+
 for path, name, files in os.walk(experiment_folder):
 	for file in files:
 		if (file == result_file_name):
@@ -91,12 +94,15 @@ for path, name, files in os.walk(experiment_folder):
 				print("stab_4:", bat_stab_4)
 				print("\n")
 
-			open(path + "/calculated_results.txt", 'w') # create file
-			with open(path + "/calculated_results.txt", 'a') as results_out:
-				results_out.write("fid_1: " + str(bat_fid_1))
-				results_out.write("fid_2: " + str(bat_fid_2))
-				results_out.write("stab_1: " + str(bat_stab_1))
-				results_out.write("stab_2: " + str(bat_stab_2))
-				results_out.write("stab_3: " + str(bat_stab_3))
-				results_out.write("stab_4: " + str(bat_stab_4))
+			
+			with open("derived_results_csv.txt", 'a') as results_out:
+				out = path.split("/")[1] + '_' + str(path.split("/")[2]) + ', ' + \
+						str(bat_fid_1) + ', ' + \
+						str(bat_fid_2) + ', ' + \
+						str(bat_stab_1) + ', ' + \
+						str(bat_stab_2) + ', ' + \
+						str(bat_stab_3) + ', ' + \
+						str(bat_stab_4)
+				results_out.write(out + "\n")
+
 print("DONE!")
