@@ -13,8 +13,11 @@ experiment_folder = "final_experiment"
 result_file_name = "results_csv.txt"
 DEBUG = False
 
+modelNum = ('A','B','C','D','E','F')
+headers = "EXMO, FID < 5, FID < 2, , EXMO, Acc. 50-85%, Acc. 60-75%, Avg. Acc. 50-85%, Avg. Acc. 60-75%"
+
 with open("derived_results_csv.txt", 'w') as out_file: # create file
-	out_file.write("exmo, fid_1, fid_2, stab_1, stab_2, stab_3, stab_4\n")
+	out_file.write(headers + "\n")
 
 def out_str(input):
 	if (input == -1):
@@ -100,11 +103,12 @@ for path, name, files in os.walk(experiment_folder):
 				print("stab_4:", bat_stab_4)
 				print("\n")
 
-			
+			exmo_name = path.split("/")[1][4:] + ' ' + modelNum[int(path.split("/")[2])]
 			with open("derived_results_csv.txt", 'a') as results_out:
-				out = path.split("/")[1] + '_' + str(path.split("/")[2]) + ', ' + \
+				out = exmo_name + ', ' + \
 						out_str(bat_fid_1) + ', ' + \
 						out_str(bat_fid_2) + ', ' + \
+						', ' + exmo_name + ', ' + \
 						out_str(bat_stab_1) + ', ' + \
 						out_str(bat_stab_2) + ', ' + \
 						out_str(bat_stab_3) + ', ' + \
