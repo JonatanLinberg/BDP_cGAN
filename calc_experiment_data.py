@@ -14,7 +14,7 @@ result_file_name = "results_csv.txt"
 DEBUG = False
 
 modelNum = ('A','B','C','D','E','F')
-headers = "EXMO, FID < 5, FID < 2, , EXMO, Acc. 50-85%, Acc. 60-75%, Avg. Acc. 50-85%, Avg. Acc. 60-75%"
+headers = "EXMO, FID < 5 (batches), FID < 5, FID < 2 (batches), FID < 2, , EXMO, Acc. 50-85%, Acc. 60-75%, Avg. Acc. 50-85%, Avg. Acc. 50-85% (Epochs), Avg. Acc. 60-75%, Avg. Acc. 60-75% (epochs)"
 print(headers)
 
 def out_str(input):
@@ -108,11 +108,11 @@ for path, name, files in os.walk(experiment_folder):
 			exmo_name = exmo_num + ' ' + modelNum[int(path.split("/")[2])]
 
 			out = exmo_name + ', ' + \
-					out_str(bat_fid_1) + ', ' + \
-					out_str(bat_fid_2) + ', ' + \
-					', ' + exmo_name + ', ' + \
+					out_str(bat_fid_1) + ', , ' + \
+					out_str(bat_fid_2) + ', , , ' + \
+					exmo_name + ', ' + \
 					out_str(bat_stab_1) + ', ' + \
 					out_str(bat_stab_2) + ', ' + \
-					out_str(bat_stab_3) + ', ' + \
-					out_str(bat_stab_4)
+					out_str(bat_stab_3) + ', , ' + \
+					out_str(bat_stab_4) + ', '
 			print(out)
