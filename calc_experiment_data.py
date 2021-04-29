@@ -13,7 +13,7 @@ experiment_folder = "final_experiment"
 result_file_name = "results_csv.txt"
 
 modelNum = ('A','B','C','D','E','F')
-headers = "EXMO, FID < 5 (batches), FID < 5, FID < 2 (batches), FID < 2, , EXMO, Acc. 50-85%, Acc. 60-75%, Avg. Acc. 50-85%, Avg. Acc. 50-85% (Epochs), Avg. Acc. 60-75%, Avg. Acc. 60-75% (epochs), , EXMO, argmin(FID), min(FID)"
+headers = "EXMO, FID < 5 (batches), FID < 5, FID < 2 (batches), FID < 2, , EXMO, Acc. 50-85%, Acc. 60-75%, Avg. Acc. 50-85%, Avg. Acc. 50-85% (epochs), Avg. Acc. 60-75%, Avg. Acc. 60-75% (epochs), , EXMO, argmin(FID), min(FID)"
 print(headers)
 
 def out_str(input):
