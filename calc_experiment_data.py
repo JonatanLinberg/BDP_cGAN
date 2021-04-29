@@ -11,10 +11,9 @@ ACC_LOW_2 = 0.6
 ACC_HIGH_2 = 0.75
 experiment_folder = "final_experiment"
 result_file_name = "results_csv.txt"
-DEBUG = False
 
 modelNum = ('A','B','C','D','E','F')
-headers = "EXMO, FID < 5 (batches), FID < 5, FID < 2 (batches), FID < 2, , EXMO, Acc. 50-85%, Acc. 60-75%, Avg. Acc. 50-85%, Avg. Acc. 50-85% (Epochs), Avg. Acc. 60-75%, Avg. Acc. 60-75% (epochs)"
+headers = "EXMO, FID < 5 (batches), FID < 5, FID < 2 (batches), FID < 2, , EXMO, Acc. 50-85%, Acc. 60-75%, Avg. Acc. 50-85%, Avg. Acc. 50-85% (Epochs), Avg. Acc. 60-75%, Avg. Acc. 60-75% (epochs), , EXMO, argmin(FID), min(FID)"
 print(headers)
 
 def out_str(input):
@@ -29,6 +28,8 @@ for path, name, files in os.walk(experiment_folder):
 			results_in = pd.read_csv(path + "/" + file, names=['d_loss_real','d_loss_fake','g_loss', 'd_acc_real', 'd_acc_fake','FID'])
 			bat_fid_1 = -1
 			bat_fid_2 = -1
+			min_fid = 1000
+			min_fid_bat = -1
 			bat_stab_1 = -1
 			bat_stab_2 = -1
 			bat_stab_3 = -1
@@ -36,6 +37,9 @@ for path, name, files in os.walk(experiment_folder):
 
 			# count FID
 			for i, val in enumerate(results_in['FID']):
+				if (val < min_fid):
+					min_fid = val
+
 				if (bat_fid_1 == -1 and val > 0 and val < FID_1):
 					bat_fid_1 = i
 				if (bat_fid_2 == -1 and val > 0 and val < FID_2):
@@ -90,16 +94,6 @@ for path, name, files in os.walk(experiment_folder):
 						if (bat_stab_4 < new_bat_stab):
 							bat_stab_4 = new_bat_stab
 						s4_start = -1
-			
-			if (DEBUG):
-				print(path.split("/")[1])
-				print("fid_1:", bat_fid_1)
-				print("fid_2:", bat_fid_2)
-				print("stab_1:", bat_stab_1)
-				print("stab_2:", bat_stab_2)
-				print("stab_3:", bat_stab_3)
-				print("stab_4:", bat_stab_4)
-				print("\n")
 
 			exmo_num = path.split("/")[1][4:]
 			if (len(exmo_num) < 2):
@@ -109,10 +103,13 @@ for path, name, files in os.walk(experiment_folder):
 
 			out = exmo_name + ', ' + \
 					out_str(bat_fid_1) + ', , ' + \
-					out_str(bat_fid_2) + ', , , ' + \
+					out_str(bat_fid_2) + ', , ' + \
 					exmo_name + ', ' + \
 					out_str(bat_stab_1) + ', ' + \
 					out_str(bat_stab_2) + ', ' + \
 					out_str(bat_stab_3) + ', , ' + \
-					out_str(bat_stab_4) + ', '
+					out_str(bat_stab_4) + ', , , ' + \
+					exmo_name + ', ' + \
+					out_str(min_fid_bat) + ', ' + \
+					out_str(min_fid)
 			print(out)
