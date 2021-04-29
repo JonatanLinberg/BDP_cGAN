@@ -108,7 +108,7 @@ for path, name, files in os.walk(experiment_folder):
 					out_str(bat_stab_1) + ', ' + \
 					out_str(bat_stab_2) + ', ' + \
 					out_str(bat_stab_3) + ', , ' + \
-					out_str(bat_stab_4) + ', , , , ' + \
+					out_str(bat_stab_4) + ', , , ' + \
 					exmo_name + ', ' + \
 					out_str(min_fid_bat) + ', ' + \
 					out_str(min_fid)
