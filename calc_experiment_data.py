@@ -37,9 +37,9 @@ for path, name, files in os.walk(experiment_folder):
 
 			# count FID
 			for i, val in enumerate(results_in['FID']):
-				if (val < min_fid):
+				if (val > 0 and val < min_fid):
 					min_fid = val
-
+					min_fid_bat = i
 				if (bat_fid_1 == -1 and val > 0 and val < FID_1):
 					bat_fid_1 = i
 				if (bat_fid_2 == -1 and val > 0 and val < FID_2):
@@ -108,7 +108,7 @@ for path, name, files in os.walk(experiment_folder):
 					out_str(bat_stab_1) + ', ' + \
 					out_str(bat_stab_2) + ', ' + \
 					out_str(bat_stab_3) + ', , ' + \
-					out_str(bat_stab_4) + ', , , ' + \
+					out_str(bat_stab_4) + ', , , , ' + \
 					exmo_name + ', ' + \
 					out_str(min_fid_bat) + ', ' + \
 					out_str(min_fid)
