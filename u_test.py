@@ -35,5 +35,3 @@ for exmo in exmos:
 		st, p = mannwhitneyu([data[j][i] for j in range(len(runs))], [baseline_data[j][i] for j in range(len(runs))])
 		out += ["%.3f"%p]
 	print(', '.join(out))
-
-	#print(','.join([exmo]+data[0]))
