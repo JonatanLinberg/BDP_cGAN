@@ -8,6 +8,7 @@ for i, exmo in enumerate(exmos):
 		exmos[i] = '0' + exmo
 runs = (' A', ' B', ' C')
 data_cols = [0, 2, 6, 7, 8, 10]
+alt_hyp_cols = ['less', 'less', 'greater', 'greater', 'greater', 'greater']
 
 infile = "derived_results_csv.txt"
 results = {}
@@ -22,16 +23,29 @@ headers = [results['EXMO'][i] for i in data_cols]
 print(', '.join(['EXMO'] + headers))
 
 # baseline 
-baseline_data = []
+baseline_data = {col:[] for col in data_cols}
 for run in runs:
-	baseline_data.append([results['00'+run][i] for i in data_cols])
+	for i, col in enumerate(data_cols):
+		try:
+			baseline_data[col].append(int(results['00'+run][col]))
+		except:
+			pass
 
 for exmo in exmos:
-	data = []
+	data = {col:[] for col in data_cols}
 	for run in runs:
-		data.append([results[exmo+run][i] for i in data_cols])
+		for i, col in enumerate(data_cols):
+			try:
+				data[col].append(int(results[exmo+run][col]))
+			except:
+				pass
+
 	out = [exmo]
-	for i in range(len(data_cols)):
-		st, p = mannwhitneyu([data[j][i] for j in range(len(runs))], [baseline_data[j][i] for j in range(len(runs))])
-		out += ["%.3f"%p]
+	for i, col in enumerate(data_cols):
+		if (data[col] != []):
+			_, p = mannwhitneyu(data[col], baseline_data[col], alternative=alt_hyp_cols[i])
+			out += ["%.3f"%p]
+		else:
+			out += ["-----"]
+		
 	print(', '.join(out))
