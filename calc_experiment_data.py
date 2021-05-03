@@ -30,10 +30,10 @@ for path, name, files in os.walk(experiment_folder):
 			bat_fid_2 = -1
 			min_fid = 1000
 			min_fid_bat = -1
-			bat_stab_1 = -1
-			bat_stab_2 = -1
-			bat_stab_3 = -1
-			bat_stab_4 = -1
+			bat_stab_1 = 0
+			bat_stab_2 = 0
+			bat_stab_3 = 0
+			bat_stab_4 = 0
 
 			# count FID
 			for i, val in enumerate(results_in['FID']):
