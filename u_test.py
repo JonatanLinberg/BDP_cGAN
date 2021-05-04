@@ -10,7 +10,7 @@ runs = (' A', ' B', ' C')
 data_cols = [0, 2, 6, 7, 8, 10]
 alt_hyp_cols = ['less', 'less', 'greater', 'greater', 'greater', 'greater']
 
-infile = "derived_results_csv.txt"
+infile = "data/derived_results.csv"
 results = {}
 
 # load data
@@ -44,6 +44,7 @@ for exmo in exmos:
 	for i, col in enumerate(data_cols):
 		if (data[col] != []):
 			_, p = mannwhitneyu(data[col], baseline_data[col], alternative=alt_hyp_cols[i])
+			
 			out += ["%.3f"%p]
 		else:
 			out += ["-----"]
