@@ -119,6 +119,22 @@ def generate_latent_points_not_random(latent_dim, rows, cols, map_range, map_dim
 					lps[i, j, k] = 0#(lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
 	return lps.reshape(cols*rows, latent_dim)
 
+def ascii_print(out, rows, cols):
+	for i in range(rows):
+		chars = out[i*cols:(i+1)*cols]
+		for y in range(28):
+			for c in chars:
+				for x in range(28):
+					px = c[y, x]
+					if (px > 0.8):
+						print(chr(0x2593), end='')
+					elif (px > 0.5):
+						print(chr(0x2592), end='')
+					elif (px > 0.3):
+						print(chr(0x2591), end='')
+					else:
+						print(' ', end='')
+			print('')
 
 # create and save a plot of generated images
 def save_plot(examples, rows, cols):
@@ -145,6 +161,7 @@ in_char_id = None
 text_width = -1
 in_dim = [-1, -1]
 latent_dim = 100
+ascii_out = False
 
 # load model
 if (len(argv) > 1):
@@ -171,6 +188,8 @@ if (len(argv) > 1):
 					except:
 						print('Invalid file name!\nusage:\n\t"python gen_cGAN.py -f <f_name>"')
 						f_name = ""
+				elif (opt == 'x'):
+					ascii_out = True
 				elif (opt == 't'):
 					in_text = True
 				elif (opt == 'w'):
@@ -178,11 +197,6 @@ if (len(argv) > 1):
 						text_width = int(argv[i+1])
 					except:
 						print('Invalid text width!\nusage:\n\t"python gen_cGAN.py -w <text width>"')
-				elif (opt == 'D'):
-					try:
-						latent_dim = int(argv[i+1])
-					except:
-						print('Invalid number of dimensions!\nusage:\n\t"python gen_cGAN.py -l <number of dims>"')
 				elif (opt == 'L'):
 					try:
 						lat_map_range = float(argv[i+1])*2
@@ -214,11 +228,11 @@ if (len(argv) > 1):
 							'" -dx <latent_dim>":\t- Integer, specifies latent dimension for map dimension x',
 							'" -dy <latent_dim>":\t- Integer, specifies latent dimension for map dimension y',
 							'" -e ":\t\t\t- Euclidean Box-Plot mode, calculates and shows euclidean distance in the generated images',
+							'" -x ":\t\t\t- ASCII output mode',
 							sep='\n')
 					quit()
-
 						
-print('Use "python char_gen.py -H" for a list of all options')
+print('Use "python char_gen.py -H" for a list of all options\n')
 
 if (f_name == ""):
 	f_name = input('Enter generator file name: ')
@@ -283,7 +297,10 @@ while(not in_text):
 	if (eucl):
 		plot_euclidean_distance(out, e_classes)
 	else:
-		save_plot(out, rows, n_classes)
+		if (not ascii_out):
+			save_plot(out, rows, n_classes)
+		else:
+			ascii_print(out, rows, n_classes)
 
 text = ['this', 'is', 'placeholder', 'text', 'this  text  is  unneccessarily  spaced           ']
 # text string is not None
@@ -311,6 +328,9 @@ while (n_classes == 47):
 		for w in range(width):
 			if (space_arr[h, w]):
 				out[h*width+w] = zeros((28, 28, 1), dtype=float32)
-	save_plot(out, height, width)
+	if (not ascii_out):
+		save_plot(out, height, width)
+	else:
+		ascii_print(out, height, width)
 
 input('Sorry, "-t" is only available for 47-class models\n')
