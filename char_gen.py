@@ -16,6 +16,7 @@ from numpy.random import randint
 from tensorflow.keras.models import load_model
 from matplotlib import pyplot
 from sys import argv
+from time import sleep
 
 def plot_euclidean_distance(examples, n_cl):
 	n_ex = len(examples)
@@ -53,7 +54,7 @@ def to_label(in_lbl):
 					return i
 		elif (in_lbl == a):
 			return i
-	return 0
+	return -1
 
 def placeTextInArray(textList, textWidth = -1):
 	n_cols = 0
@@ -135,6 +136,7 @@ def ascii_print(out, rows, cols):
 					else:
 						print(' ', end='')
 			print('')
+		sleep(0.3)
 
 # create and save a plot of generated images
 def save_plot(examples, rows, cols):
@@ -251,7 +253,11 @@ while(not in_text):
 			char = int(in_char)
 		except ValueError:
 			char = to_label(in_char)
-			print("Using char ID:", char, "(", label_arr[char], ")")
+			print("Using char ID:", char, end='')
+			if (char >= 0):
+				print("(", label_arr[char], ")")
+			else:
+				print('')
 		except Exception as e:
 			print(e)
 			quit()
@@ -315,11 +321,15 @@ while (n_classes == 47):
 	# text to int array
 	labels = zeros((space_arr.shape), dtype=int)
 	for i, _ in enumerate(labels):
-		for j, _ in enumerate(labels[i]):
+		for j, _ in enumerate(labels[i]):	
 			try:
 				labels[i,j] = to_label(text[i][j])
 			except:
 				labels[i,j] = 0
+			if (labels[i,j] == -1):
+				labels[i,j] = 0
+				space_arr[i,j] = True
+
 	height, width = labels.shape[0], labels.shape[1]
 	lat_pts = generate_latent_points_similar(latent_dim, height*width)
 	out = model.predict([lat_pts, labels.reshape(height*width)])
