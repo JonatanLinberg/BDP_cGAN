@@ -126,11 +126,11 @@ def ascii_print(out, rows, cols):
 			for c in chars:
 				for x in range(28):
 					px = c[y, x]
-					if (px > 0.8):
+					if (px > 0.9):
 						print(chr(0x2593), end='')
 					elif (px > 0.5):
 						print(chr(0x2592), end='')
-					elif (px > 0.3):
+					elif (px > 0.1):
 						print(chr(0x2591), end='')
 					else:
 						print(' ', end='')
