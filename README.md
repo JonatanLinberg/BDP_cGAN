@@ -37,7 +37,7 @@ The program features one slider for each latent dimension, for exploration the l
 
 
 #### Character Generator ([char_gen.py](/char_gen.py))
-The program can be used to generate characters and text using a generator model. A full list of options can be found by using the "-H" option. Can also evaluate the euclidean distance between the generated images and present them as a box plot.
+The program can be used to generate characters and text using a generator model. A full list of the many features can be found by using the "-H" option. Can also evaluate the euclidean distance between the generated images and present them as a box plot.
 
 ##### Usage:
 * `python char_gen.py -[options]`
