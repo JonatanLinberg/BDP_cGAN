@@ -1,8 +1,9 @@
 from scipy.stats import mannwhitneyu
 import csv
+import numpy
 
 n_exmos = 29
-exmos = [str(i) for i in range(1, n_exmos)]
+exmos = [str(i) for i in range(n_exmos)]
 for i, exmo in enumerate(exmos):
 	if (len(exmo) < 2):
 		exmos[i] = '0' + exmo
@@ -22,31 +23,29 @@ with open(infile, 'r') as file:
 headers = [results['EXMO'][i] for i in data_cols]
 print(', '.join(['EXMO'] + headers))
 
-# baseline 
-baseline_data = {col:[] for col in data_cols}
-for run in runs:
-	for i, col in enumerate(data_cols):
-		try:
-			baseline_data[col].append(int(results['00'+run][col]))
-		except:
-			pass
-
-for exmo in exmos:
-	data = {col:[] for col in data_cols}
+data = []
+for i, exmo in enumerate(exmos):
+	data.append([[] for j, _ in enumerate(data_cols)])
 	for run in runs:
-		for i, col in enumerate(data_cols):
+		for j, col in enumerate(data_cols):
 			try:
-				data[col].append(int(results[exmo+run][col]))
+				data[i][j].append(int(results[exmo+run][col]))
 			except:
 				pass
 
+
+for i, exmo in enumerate(exmos):
 	out = [exmo]
-	for i, col in enumerate(data_cols):
-		if (data[col] != []):
-			_, p = mannwhitneyu(data[col], baseline_data[col], alternative=alt_hyp_cols[i])
-			
+	rest_data = []
+	
+	for j in range(len(data_cols)):
+		rest_data.append([])
+		if (data[i][j] != []):
+			for d in data[:i] + data[i+1:]:
+				rest_data[j] += d[j]
+
+			_, p = mannwhitneyu(data[i][j], rest_data[j], alternative=alt_hyp_cols[j])
 			out += ["%.3f"%p]
 		else:
 			out += ["-----"]
-		
-	print(', '.join(out))
+	print(','.join(out))
