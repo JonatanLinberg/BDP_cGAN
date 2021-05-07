@@ -90,20 +90,52 @@ def placeTextInArray(textList, textWidth = -1):
 				quit()
 	return textList, space_map
 
+class n_lat_pt_exception(Exception):
+	def __init__(self, got, expected):
+		self.got = got
+		self.expected = expected
+
+	def __str__(self):
+		return 'Incorrect number of latent point dimensions!\nGot: ' + str(self.got) + '\nExpected: ' + str(self.expected)
+
+
+def load_latent_point(latent_dim, n_samples, filename=""):
+	in_lpt = zeros((n_samples, latent_dim), dtype='float32')
+	if (filename != ""):
+		with open(filename) as lpt_file:	
+			i=0
+			for line in lpt_file:
+				if (line[0] == '#'):
+					try:
+						n_lptf = int(line[1:])
+						if (n_lptf != latent_dim):
+							raise n_lat_pt_exception(n_lptf, latent_dim)
+					except Exception as ex:
+						print(ex)
+						quit()
+				else:
+					for pt in in_lpt:
+						pt[i] = float(line)
+					i += 1
+	return in_lpt
+
+
 # generate points in latent space as input for the generator
-def generate_latent_points(latent_dim, n_samples):
+def generate_latent_points(latent_dim, n_samples, lptf_base_fname=""):
+	if (lptf_base_fname != ""):
+		return load_latent_point(latent_dim, n_samples, lptf_base_fname)
 	# generate points in the latent space
 	x_input = randn(latent_dim * n_samples)
 	# reshape into a batch of inputs for the network
 	z_input = x_input.reshape(n_samples, latent_dim)
 	return z_input
 
-def generate_latent_points_similar(latent_dim, n_samples):
-	pt = generate_latent_points(latent_dim, 1)
+def generate_latent_points_similar(latent_dim, n_samples, lptf_base_fname=""):
+	pt = generate_latent_points(latent_dim, 1, lptf_base_fname)
 	return (generate_latent_points(latent_dim, n_samples) / 2.5) + full((n_samples, latent_dim), pt[0])
 
-def generate_latent_points_not_random(latent_dim, rows, cols, map_range, map_dim = [-1, -1]):
-	lps = generate_latent_points(latent_dim, rows*cols)
+def generate_latent_points_not_random(latent_dim, rows, cols, map_range, map_dim = [-1, -1], lptf_base_fname=""):
+	lps = load_latent_point(latent_dim, rows*cols, lptf_base_fname)
 	lps = lps.reshape(rows, cols, latent_dim)
 	for i in range(rows):
 		val_i = map_range*(i + 0.5 - rows*0.5) / rows
@@ -111,13 +143,13 @@ def generate_latent_points_not_random(latent_dim, rows, cols, map_range, map_dim
 			val_j = map_range*(j + 0.5 - cols*0.5) / cols
 			for k in range(latent_dim):
 				if (map_dim[0] == -1 and map_dim[1] == -1):
-					lps[i, j, k] = ((k%2 or rows<=1) * val_i + ((k+1)%2 or cols<=1) * val_j)# + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
+					lps[i, j, k] = lps[i, j, k] + ((k%2 or rows<=1) * val_i + ((k+1)%2 or cols<=1) * val_j)# + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
 				elif (k == map_dim[0]): # dim 0 means val_i for dim k==dim[0]
-					lps[i, j, k] = (val_i)# + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
+					lps[i, j, k] = lps[i, j, k] + (val_i)# + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
 				elif (k == map_dim[1]): # dim 1 means val_j for dim k==dim[1]
-					lps[i, j, k] = (val_j)# + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
+					lps[i, j, k] = lps[i, j, k] + (val_j)# + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
 				else:
-					lps[i, j, k] = 0#(lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
+					lps[i, j, k] = lps[i, j, k] + 0#(lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
 	return lps.reshape(cols*rows, latent_dim)
 
 def ascii_print(out, rows, cols):
@@ -164,6 +196,7 @@ text_width = -1
 in_dim = [-1, -1]
 latent_dim = 100
 ascii_out = False
+lptf_name = ""
 
 # load model
 if (len(argv) > 1):
@@ -194,6 +227,11 @@ if (len(argv) > 1):
 					ascii_out = True
 				elif (opt == 't'):
 					in_text = True
+				elif (opt == 'p'):
+					try:
+						lptf_name = argv[i+1]
+					except:
+						print('Could not load latent point from file!\nusage:\n\t"python gen_cGAN.py -p <path to .lptf file> "')
 				elif (opt == 'w'):
 					try:
 						text_width = int(argv[i+1])
@@ -231,6 +269,7 @@ if (len(argv) > 1):
 							'" -dy <latent_dim>":\t- Integer, specifies latent dimension for map dimension y',
 							'" -e ":\t\t\t- Euclidean Box-Plot mode, calculates and shows euclidean distance in the generated images',
 							'" -x ":\t\t\t- ASCII output mode',
+							'" -p <.lptf file> ":\t- load a latent point from .lptf file',
 							sep='\n')
 					quit()
 						
@@ -267,17 +306,17 @@ while(not in_text):
 	else:	# only do once when -C
 		quit()
 	# generate images
-	latent_points = generate_latent_points(latent_dim, rows*n_classes)
+	latent_points = generate_latent_points(latent_dim, rows*n_classes, lptf_base_fname=lptf_name)
 	if (lat_map_range != 0):
 		if (char == -1):
 			latent_points = latent_points.reshape((rows, n_classes, latent_dim))
 			for c in range(n_classes):
-				pts = generate_latent_points_not_random(latent_dim, rows, 1, lat_map_range, map_dim=in_dim)
+				pts = generate_latent_points_not_random(latent_dim, rows, 1, lat_map_range, map_dim=in_dim, lptf_base_fname=lptf_name)
 				for r in range(rows):
 					latent_points[r, c] = pts[r]
 			latent_points = latent_points.reshape((n_classes*rows, latent_dim))
 		else:
-			latent_points = generate_latent_points_not_random(latent_dim, rows, n_classes, lat_map_range, map_dim=in_dim)
+			latent_points = generate_latent_points_not_random(latent_dim, rows, n_classes, lat_map_range, map_dim=in_dim, lptf_base_fname=lptf_name)
 	# specify labels
 	labels = zeros(n_classes*rows)
 	# generate images

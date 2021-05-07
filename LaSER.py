@@ -141,10 +141,12 @@ class GuiGen(tk.Frame):
 		self.randomBound = tk.Scale(self.char_frame, from_=0, to=3*lat_scale, label='Random Bound', length=col_w, orient=tk.HORIZONTAL)
 		self.randomBound.set(3*lat_scale)
 		self.randomBound.place(relx=0.5, rely=0.4, anchor='c')
+		save_lat_pt_btn = tk.Button(self.char_frame, text="Save Latent Point", command=self.save_latent_point)
+		save_lat_pt_btn.place(relx=0.5, rely=0.35, anchor='c')
 		randomiseBtn = tk.Button(self.char_frame, text='Randomise', command=self.randomise_latent_point)
-		randomiseBtn.place(relx=0.5, rely=0.35, anchor='c')
+		randomiseBtn.place(relx=0.5, rely=0.32, anchor='c')
 		normaliseBtn = tk.Button(self.char_frame, text='Normalise', command=self.normalise_latent_point)
-		normaliseBtn.place(relx=0.5, rely=0.3, anchor='c')
+		normaliseBtn.place(relx=0.5, rely=0.29, anchor='c')
 		self.vectorSlider = tk.Scale(self.char_frame, from_=trav_vec_min, to=trav_vec_max, label='Traverse Vector', length=col_w, orient=tk.HORIZONTAL, command=self.set_vector_percent)
 		self.vectorSlider.place(relx=0.5, rely=0.21, anchor='c')
 		saveVecBtn = tk.Button(self.char_frame, text='Save Vector', command=self.save_vector)
@@ -160,6 +162,15 @@ class GuiGen(tk.Frame):
 		self.figureFrame = tk.Frame(self.char_frame)
 		self.set_should_update_figure(True)
 		self.parent.after(0, self.updateFigure)
+
+	def save_latent_point(self):
+		try:
+			with tk.filedialog.asksaveasfile(title="Save latent point as:", initialdir="./", filetypes=[("Latent Point file", "*.lptf")]) as outfile:
+				outfile.write("#" + str(self.n_latent_dim) + "\n")
+				for p in self.lat_pt[0]:
+					outfile.write(str(p) + "\n")
+		except:
+			pass
 
 	def save_base_vector(self):
 		self.base_vector = array(self.lat_pt)
