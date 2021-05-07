@@ -130,9 +130,9 @@ def generate_latent_points(latent_dim, n_samples, lptf_base_fname=""):
 	z_input = x_input.reshape(n_samples, latent_dim)
 	return z_input
 
-def generate_latent_points_similar(latent_dim, n_samples, lptf_base_fname=""):
+def generate_latent_points_similar(latent_dim, n_samples, lptf_base_fname="", variation=0.4):
 	pt = generate_latent_points(latent_dim, 1, lptf_base_fname)
-	return (generate_latent_points(latent_dim, n_samples) / 2.5) + full((n_samples, latent_dim), pt[0])
+	return (generate_latent_points(latent_dim, n_samples) * variation) + full((n_samples, latent_dim), pt[0])
 
 def generate_latent_points_not_random(latent_dim, rows, cols, map_range, map_dim = [-1, -1], lptf_base_fname=""):
 	lps = load_latent_point(latent_dim, rows*cols, lptf_base_fname)
@@ -197,6 +197,7 @@ in_dim = [-1, -1]
 latent_dim = 100
 ascii_out = False
 lptf_name = ""
+text_var = 0.4
 
 # load model
 if (len(argv) > 1):
@@ -227,6 +228,11 @@ if (len(argv) > 1):
 					ascii_out = True
 				elif (opt == 't'):
 					in_text = True
+				elif (opt == 'v'):
+					try:
+						text_var = float(argv[i+1])
+					except:
+						print('Invalid text variation level specification!\nusage:\n\t" -t <variation level> "')
 				elif (opt == 'p'):
 					try:
 						lptf_name = argv[i+1]
@@ -261,12 +267,13 @@ if (len(argv) > 1):
 					print(	'" -f <model.h5> ":\t- Load generator from file "model.h5"', 
 							'" -c <n_classes> ":\t- Integer, number of data classes',
 							'" -C <n_classes> ":\t- Integer, character class',
-							'" -r <n_rows>":\t\t- Integer, number of rows to be generated',
+							'" -r <n_rows> ":\t\t- Integer, number of rows to be generated',
 							'" -t ":\t\t\t- Text generation mode',
+							'" -v <variation level> ":\t- Float, variation level in text generation mode',
 							'" -w <width>":\t\t- Integer, row width for text generation mode',
-							'" -L <latent_std>":\t- Float, standard deviation for latent space map',
-							'" -dx <latent_dim>":\t- Integer, specifies latent dimension for map dimension x',
-							'" -dy <latent_dim>":\t- Integer, specifies latent dimension for map dimension y',
+							'" -L <latent_std> ":\t- Float, standard deviation for latent space map',
+							'" -dx <latent_dim> ":\t- Integer, specifies latent dimension for map dimension x',
+							'" -dy <latent_dim> ":\t- Integer, specifies latent dimension for map dimension y',
 							'" -e ":\t\t\t- Euclidean Box-Plot mode, calculates and shows euclidean distance in the generated images',
 							'" -x ":\t\t\t- ASCII output mode',
 							'" -p <.lptf file> ":\t- load a latent point from .lptf file',
@@ -370,7 +377,7 @@ while (n_classes == 47):
 				space_arr[i,j] = True
 
 	height, width = labels.shape[0], labels.shape[1]
-	lat_pts = generate_latent_points_similar(latent_dim, height*width)
+	lat_pts = generate_latent_points_similar(latent_dim, height*width, lptf_name, variation=text_var)
 	out = model.predict([lat_pts, labels.reshape(height*width)])
 	out = (out +1) / 2.0
 	for h in range(height):
