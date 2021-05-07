@@ -42,6 +42,10 @@ NoneType = type(None)
 trav_anim_figs = []
 gif_speed = 0.15
 
+class n_lat_pt_exception(Exception):
+	def __init__(self, got, expected):
+		self.got = got
+		self.expected = expected
 
 # generate points in latent space as input for the generator
 def generate_latent_point(latent_dim):
@@ -141,12 +145,14 @@ class GuiGen(tk.Frame):
 		self.randomBound = tk.Scale(self.char_frame, from_=0, to=3*lat_scale, label='Random Bound', length=col_w, orient=tk.HORIZONTAL)
 		self.randomBound.set(3*lat_scale)
 		self.randomBound.place(relx=0.5, rely=0.4, anchor='c')
+		load_lat_pt_btn = tk.Button(self.char_frame, text="Load Latent Point", command=self.load_latent_point)
+		load_lat_pt_btn.place(relx=0.5, rely=0.35, anchor='c')
 		save_lat_pt_btn = tk.Button(self.char_frame, text="Save Latent Point", command=self.save_latent_point)
-		save_lat_pt_btn.place(relx=0.5, rely=0.35, anchor='c')
+		save_lat_pt_btn.place(relx=0.5, rely=0.32, anchor='c')
 		randomiseBtn = tk.Button(self.char_frame, text='Randomise', command=self.randomise_latent_point)
-		randomiseBtn.place(relx=0.5, rely=0.32, anchor='c')
+		randomiseBtn.place(relx=0.5, rely=0.29, anchor='c')
 		normaliseBtn = tk.Button(self.char_frame, text='Normalise', command=self.normalise_latent_point)
-		normaliseBtn.place(relx=0.5, rely=0.29, anchor='c')
+		normaliseBtn.place(relx=0.5, rely=0.26, anchor='c')
 		self.vectorSlider = tk.Scale(self.char_frame, from_=trav_vec_min, to=trav_vec_max, label='Traverse Vector', length=col_w, orient=tk.HORIZONTAL, command=self.set_vector_percent)
 		self.vectorSlider.place(relx=0.5, rely=0.21, anchor='c')
 		saveVecBtn = tk.Button(self.char_frame, text='Save Vector', command=self.save_vector)
@@ -171,6 +177,27 @@ class GuiGen(tk.Frame):
 					outfile.write(str(p) + "\n")
 		except:
 			pass
+
+	def load_latent_point(self):
+		in_lpt = zeros((1, self.n_latent_dim), dtype='float32')
+		with tk.filedialog.askopenfile(title="Load latent point:", initialdir="./", filetypes=[("Latent Point file", "*.lptf")]) as infile:
+			i = 0
+			for line in infile:
+				if (line[0] == '#'):
+					try:
+						n_lptf = int(line[1:])
+						if (n_lptf != self.n_latent_dim):
+							raise n_lat_pt_exception(n_lptf, self.n_latent_dim)
+					except Exception as ex:
+						tk.messagebox.showinfo("Cannot load latent point!", str(ex))
+						return
+				else:
+					for pt in in_lpt:
+						pt[i] = float(line)
+					i += 1
+		for i, dim in enumerate(in_lpt[0]):
+			self.set_slider_val(i, dim*lat_scale)
+
 
 	def save_base_vector(self):
 		self.base_vector = array(self.lat_pt)
