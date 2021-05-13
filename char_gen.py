@@ -271,7 +271,7 @@ if (len(argv) > 1):
 							'" -t ":\t\t\t- Text generation mode',
 							'" -v <variation level> ":\t- Float, variation level in text generation mode',
 							'" -w <width>":\t\t- Integer, row width for text generation mode',
-							'" -L <latent_std> ":\t- Float, standard deviation for latent space map',
+							'" -L <latent_map_range> ":\t- Float, latent space map range (-latent_map_range to +latent_map_range)',
 							'" -dx <latent_dim> ":\t- Integer, specifies latent dimension for map dimension x',
 							'" -dy <latent_dim> ":\t- Integer, specifies latent dimension for map dimension y',
 							'" -e ":\t\t\t- Euclidean Box-Plot mode, calculates and shows euclidean distance in the generated images',
