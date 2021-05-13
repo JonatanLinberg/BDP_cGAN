@@ -21,7 +21,6 @@ with open(infile, 'r') as file:
 
 
 headers = [results['EXMO'][i] for i in data_cols]
-print(', '.join(['EXMO'] + headers))
 
 data = []
 for i, exmo in enumerate(exmos):
@@ -33,7 +32,17 @@ for i, exmo in enumerate(exmos):
 			except:
 				pass
 
+for i, exmo in enumerate(exmos):
+	for j in range(len(data_cols)):
+		for k, el in enumerate(data[i][j]):
+			if (i == 27):
+				data[i][j][k] = data[i][j][k] / 1762
+			elif (i == 28):
+				data[i][j][k] = data[i][j][k] / 440
+			else:
+				data[i][j][k] = data[i][j][k] / 881
 
+print(', '.join(['EXMO'] + headers))
 for i, exmo in enumerate(exmos):
 	out = [exmo]
 	rest_data = []
