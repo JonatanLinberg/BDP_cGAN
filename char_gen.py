@@ -171,8 +171,8 @@ def ascii_print(out, rows, cols):
 		sleep(0.3)
 
 # create and save a plot of generated images
-def save_plot(examples, rows, cols):
-	pyplot.figure(figsize=(cols * (28/96), rows * (28/96)))
+def save_plot(examples, rows, cols, outfile=""):
+	fig = pyplot.figure(figsize=(cols * (28/96), rows * (28/96)))
 	# plot images
 	for i in range(rows * cols):
 		# define subplot
@@ -183,6 +183,9 @@ def save_plot(examples, rows, cols):
 		pyplot.imshow(examples[i, :, :, 0], cmap='gray_r')
 
 	pyplot.subplots_adjust(wspace=0, hspace=0, left=0, right=1, bottom=0, top=1)
+	if (outfile != ""):
+		fig.savefig(outfile)
+		quit()
 	pyplot.show()
 
 eucl = False
@@ -198,6 +201,7 @@ latent_dim = 100
 ascii_out = False
 lptf_name = ""
 text_var = 0.4
+save_name = ""
 
 # load model
 if (len(argv) > 1):
@@ -258,6 +262,11 @@ if (len(argv) > 1):
 							raise Exception
 					except:
 						print('Invalid latent dim specification!\nusage:\n\t" -dx <latent space dim> " or " -dy <latent space dim> "')
+				elif (opt == 's'):
+					try:
+						save_name = argv[i+1]
+					except:
+						print('Invalid save name!\nusage:\n\t" -s <save f_name>"')
 				elif (opt == 'C'):
 					try:
 						in_char_id = int(argv[i+1])
@@ -277,6 +286,7 @@ if (len(argv) > 1):
 							'" -e ":\t\t\t- Euclidean Box-Plot mode, calculates and shows euclidean distance in the generated images',
 							'" -x ":\t\t\t- ASCII output mode',
 							'" -p <.lptf file> ":\t- load a latent point from .lptf file',
+							'" -s <save f_name>":\t- save output to file (only in image mode)',
 							sep='\n')
 					quit()
 						
@@ -350,7 +360,7 @@ while(not in_text):
 		plot_euclidean_distance(out, e_classes)
 	else:
 		if (not ascii_out):
-			save_plot(out, rows, n_classes)
+			save_plot(out, rows, n_classes, save_name)
 		else:
 			ascii_print(out, rows, n_classes)
 
