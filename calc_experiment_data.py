@@ -99,7 +99,14 @@ for path, name, files in os.walk(experiment_folder):
 			if (len(exmo_num) < 2):
 				exmo_num = '0' + exmo_num
 
-			exmo_name = exmo_num + ' ' + modelNum[int(path.split("/")[2])]
+			exmo_name = ""
+			try:
+				exmo_name = exmo_num + ' ' + modelNum[int(path.split("/")[2])]
+			except ValueError:
+				exmo_name = exmo_num + ' ' + path.split("/")[2].upper()
+			except Exception as ex:
+				print(ex)
+				quit()
 
 			out = exmo_name + ', ' + \
 					out_str(bat_fid_1) + ', , ' + \
