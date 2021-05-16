@@ -138,13 +138,16 @@ def latent_map_step(cur, end, lat_range, exp):
 	step = (cur + 0.5 - end*0.5)
 	max_step = (end-1)/2
 	y_max = lat_range/2
-	if (exp):
-		if (step>0):
-			return y_max * (step*step) / (max_step*max_step)
+	try:
+		if (exp):
+			if (step>0):
+				return y_max * (step*step) / (max_step*max_step)
+			else:
+				return -y_max * (step*step) / (max_step*max_step)
 		else:
-			return -y_max * (step*step) / (max_step*max_step)
-	else:
-		return step * lat_range / (end-1)
+			return step * lat_range / (end-1)
+	except ZeroDivisionError:
+		return 0.0
 
 def generate_latent_points_not_random(latent_dim, rows, cols, map_range, map_dim = [-1, -1], lptf_base_fname="", exponential=False):
 	lps = load_latent_point(latent_dim, rows*cols, lptf_base_fname)
@@ -153,7 +156,6 @@ def generate_latent_points_not_random(latent_dim, rows, cols, map_range, map_dim
 		val_i = latent_map_step(i, rows, map_range, exponential)
 		for j in range(cols):
 			val_j = latent_map_step(j, cols, map_range, exponential)
-			print(i, j, ':', val_i, val_j)
 			for k in range(latent_dim):
 				if (map_dim[0] == -1 and map_dim[1] == -1):
 					lps[i, j, k] = lps[i, j, k] + ((k%2 or rows<=1) * val_i + ((k+1)%2 or cols<=1) * val_j)# + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
