@@ -138,7 +138,7 @@ def generate_latent_points_not_random(latent_dim, rows, cols, map_range, map_dim
 	lps = load_latent_point(latent_dim, rows*cols, lptf_base_fname)
 	lps = lps.reshape(rows, cols, latent_dim)
 	for i in range(rows):
-		val_i = map_range*(i + 0.5 - rows*0.5) / rows
+		val_i = (i + 0.5 - rows*0.5) * map_range / (rows-1)
 		for j in range(cols):
 			val_j = map_range*(j + 0.5 - cols*0.5) / cols
 			for k in range(latent_dim):
