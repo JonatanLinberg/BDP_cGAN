@@ -134,13 +134,26 @@ def generate_latent_points_similar(latent_dim, n_samples, lptf_base_fname="", va
 	pt = generate_latent_points(latent_dim, 1, lptf_base_fname)
 	return (generate_latent_points(latent_dim, n_samples) * variation) + full((n_samples, latent_dim), pt[0])
 
-def generate_latent_points_not_random(latent_dim, rows, cols, map_range, map_dim = [-1, -1], lptf_base_fname=""):
+def latent_map_step(cur, end, lat_range, exp):
+	step = (cur + 0.5 - end*0.5)
+	max_step = (end-1)/2
+	y_max = lat_range/2
+	if (exp):
+		if (step>0):
+			return y_max * (step*step) / (max_step*max_step)
+		else:
+			return -y_max * (step*step) / (max_step*max_step)
+	else:
+		return step * lat_range / (end-1)
+
+def generate_latent_points_not_random(latent_dim, rows, cols, map_range, map_dim = [-1, -1], lptf_base_fname="", exponential=False):
 	lps = load_latent_point(latent_dim, rows*cols, lptf_base_fname)
 	lps = lps.reshape(rows, cols, latent_dim)
 	for i in range(rows):
-		val_i = (i + 0.5 - rows*0.5) * map_range / (rows-1)
+		val_i = latent_map_step(i, rows, map_range, exponential)
 		for j in range(cols):
-			val_j = map_range*(j + 0.5 - cols*0.5) / cols
+			val_j = latent_map_step(j, cols, map_range, exponential)
+			print(i, j, ':', val_i, val_j)
 			for k in range(latent_dim):
 				if (map_dim[0] == -1 and map_dim[1] == -1):
 					lps[i, j, k] = lps[i, j, k] + ((k%2 or rows<=1) * val_i + ((k+1)%2 or cols<=1) * val_j)# + (lps[i,j,k] / 10) * (val_i+3)/(i + 0.5)
@@ -202,6 +215,7 @@ ascii_out = False
 lptf_name = ""
 text_var = 0.4
 save_name = ""
+lat_map_exp = False
 
 # load model
 if (len(argv) > 1):
@@ -252,6 +266,8 @@ if (len(argv) > 1):
 						lat_map_range = float(argv[i+1])*2
 					except:
 						print('Invalid latent map range!\nusage:\n\t"python gen_cGAN.py -L <lat_map_range>"')
+				elif (opt == 'l'):
+					lat_map_exp = True
 				elif (opt == 'd'):
 					try:
 						if (arg[j+1] == 'x'):
@@ -281,6 +297,7 @@ if (len(argv) > 1):
 							'" -v <variation level> ":\t- Float, variation level in text generation mode',
 							'" -w <width>":\t\t- Integer, row width for text generation mode',
 							'" -L <latent_map_range> ":\t- Float, latent space map range (-latent_map_range to +latent_map_range)',
+							'" -l ":\t\t\t- Latent space map exponential mode, less extreme characters',
 							'" -dx <latent_dim> ":\t- Integer, specifies latent dimension for map dimension x',
 							'" -dy <latent_dim> ":\t- Integer, specifies latent dimension for map dimension y',
 							'" -e ":\t\t\t- Euclidean Box-Plot mode, calculates and shows euclidean distance in the generated images',
@@ -328,12 +345,12 @@ while(not in_text):
 		if (char == -1):
 			latent_points = latent_points.reshape((rows, n_classes, latent_dim))
 			for c in range(n_classes):
-				pts = generate_latent_points_not_random(latent_dim, rows, 1, lat_map_range, map_dim=in_dim, lptf_base_fname=lptf_name)
+				pts = generate_latent_points_not_random(latent_dim, rows, 1, lat_map_range, map_dim=in_dim, lptf_base_fname=lptf_name, exponential=lat_map_exp)
 				for r in range(rows):
 					latent_points[r, c] = pts[r]
 			latent_points = latent_points.reshape((n_classes*rows, latent_dim))
 		else:
-			latent_points = generate_latent_points_not_random(latent_dim, rows, n_classes, lat_map_range, map_dim=in_dim, lptf_base_fname=lptf_name)
+			latent_points = generate_latent_points_not_random(latent_dim, rows, n_classes, lat_map_range, map_dim=in_dim, lptf_base_fname=lptf_name, exponential=lat_map_exp)
 	# specify labels
 	labels = zeros(n_classes*rows)
 	# generate images
