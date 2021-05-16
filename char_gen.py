@@ -285,6 +285,7 @@ if (len(argv) > 1):
 						save_name = argv[i+1]
 					except:
 						print('Invalid save name!\nusage:\n\t" -s <save f_name>"')
+						quit()
 				elif (opt == 'C'):
 					try:
 						in_char_id = int(argv[i+1])
