@@ -25,7 +25,7 @@ Training a cGAN can be accomplished by running the [train_cgan](/train_cgan.py) 
 ### Experiment Data
 Raw data from the experiment is available in the [final experiment folder](/final_experiment), grouped by EXMO (00-28) and run (0-2). The loss, accuracy and FID measurements are in a csv plain text file and are most easily viewed with the [result plotting](#result-plotting-plot_resultspy) tool. 
 
-Derived and calculated data (including a Mann-Whitney U-test) was generated with [u_test](/u_test.py) and [calc_experiment_data](/calc_experiment_data.py) and can be found as csv-files in the [data folder](/data). The csv-files have columns for measurements in epochs, these are empty in the csv-files, but can easily be calculated by dividing the batch measurement with 881 (1762 for EXMO27 and 440 for EXMO28).
+Derived and calculated data (including a Mann-Whitney U-test) was generated with [u_test](/misc_src/u_test.py) and [calc_experiment_data](/misc_src/calc_experiment_data.py) and can be found as csv-files in the [data folder](/data). The csv-files have columns for measurements in epochs, these are empty in the csv-files, but can easily be calculated by dividing the batch measurement with 881 (1762 for EXMO27 and 440 for EXMO28).
 
 ### Tools
 #### Latent Space Explorer and Recorder ([LaSER.py](/LaSER.py))
