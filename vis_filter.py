@@ -30,8 +30,8 @@ except:
 model = load_model(MODEL_PATH)
 model = Model(inputs=model.inputs, outputs=model.layers[layer].output)
 
-# retrieve weights from the second hidden layer
-latent_pts = generate_latent_points(N_LATENT_DIM, 1) #zeros([1, N_LATENT_DIM], dtype="float32")
+latent_pts = generate_latent_points(N_LATENT_DIM, 1) 
+#latent_pts = zeros([1, N_LATENT_DIM], dtype="float32")
 out = model.predict([latent_pts, array([CLASS_ID])])
 print(model.layers[-1])
 print(out.shape)
