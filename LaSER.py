@@ -9,6 +9,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.pyplot import imshow
 from matplotlib.pyplot import axis
 from matplotlib.pyplot import subplots
+from matplotlib.pyplot import subplot
 from matplotlib.pyplot import close as plt_close
 from numpy.random import randn
 from numpy import zeros
@@ -24,6 +25,7 @@ os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
 os.environ["CUDA_VISIBLE_DEVICES"] = '-1'
 print('.', end='', flush=True)
 from tensorflow.keras.models import load_model
+from tensorflow.keras.models import Model
 print('.')
 import tensorflow as tf
 print('Starting...')
@@ -66,6 +68,30 @@ def generate_figure(model, latent_point, class_label):
 	ax.tick_params(which='both', bottom=False, top=False, left=False, right=False, labelbottom=False, labeltop=False, labelleft=False, labelright=False)
 	ax = imshow(out[0, :, :, 0], cmap='gray_r')
 	return fig 
+
+def _generate_figure_alt(model, latent_point, class_label):
+	plt_close()
+	label = zeros((1,), dtype=int)
+	label[0] = class_label
+	out = model([latent_point, label])
+	out = (out + 1) / 2.0
+	fig, ax = subplots(figsize=(2.8, 2.8))
+	model = Model(inputs=model.inputs, outputs=model.layers[-3].output)
+	out2 = model([latent_point, label])
+	rows = 3
+	cols = 3
+	for i in range(rows*cols):
+		ax = subplot(rows, cols, i+1)
+		ax.set_xticks([])
+		ax.set_yticks([])
+		if (i == 0):
+			imshow(out[0, :, :, 0], cmap='gray')
+		else:
+			imshow(out2[0, :, :, i], cmap="gray")
+	return fig
+
+# Uncomment the next line to view filter-output
+#generate_figure = _generate_figure_alt
 
 def save_trav_anim():
 	path = tk.simpledialog.askstring(title="Save as...", prompt="Animation name:")
