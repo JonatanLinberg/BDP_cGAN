@@ -1,9 +1,17 @@
-# Hyperparameters for GenerativeAdversarial Network Training - Conditional GAN on the EMNIST dataset
+# Investigation of generative adversarial network training: The effect of hyperparameters on training time and stability
 Bachelor Degree Project in Information Technology  
 IT613G, University of Skövde  
-Alexander Gustafsson, Jonatan Linberg
+Alexander Gustafsson, Jonatan Linberg  
+[Thesis Paper](http://urn.kb.se/resolve?urn=urn:nbn:se:his:diva-19847)
 
-### Contents
+### Abstract
+Generative Adversarial Networks (GAN) is a technique used to learn the distribution of some dataset in order to generate similar data. GAN models are notoriously difficult to train, which has caused limited deployment in the industry. The results of this study can be used to accelerate the process of making GANs production ready.
+
+An experiment was conducted where multiple GAN models were trained, with the hyperparameters Leaky ReLU alpha, convolutional filters, learning rate and batch size as independent variables. A Mann-Whitney U-test was used to compare the training time and training stability of each model to the others’.
+
+Except for the Leaky ReLU alpha, changes to the investigated hyperparameters had a significant effect on the training time and stability. This study is limited to a few hyperparameters and values, a single dataset and few data points, further research in the area could look at the generalisability of the results or investigate more hyperparameters.
+
+### Repository Contents
  * [Code Sources](#Code-Sources)
  * [Training a cGAN](#Training-a-cGAN)
  * [Experiment Data](#Experiment-Data)
