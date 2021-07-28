@@ -1,3 +1,12 @@
+#! THIS IS A LIGHTWEIGHT BRANCH OF THE PROJECT !
+The branch contains a single well-performing model (run 15 A, epoch 15)
+
+
+
+
+
+
+
 # Investigation of generative adversarial network training: The effect of hyperparameters on training time and stability
 Bachelor Degree Project in Information Technology  
 IT613G, University of Skövde  
